@@ -18,22 +18,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { movies, theaters, showtimes } from "@/data/mockData";
+import { Movie, Theater, Showtime, movies, theaters, showtimes, getMovieById } from "@/data/mockData";
 import ShowtimeSelector from "@/components/ui/ShowtimeSelector";
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const [movie, setMovie] = useState(movies[0]);
+  const [movie, setMovie] = useState<Movie>(movies[0]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loading, setLoading] = useState(true);
-  const [availableTheaters, setAvailableTheaters] = useState(theaters);
+  const [availableTheaters, setAvailableTheaters] = useState<Theater[]>(theaters);
 
   useEffect(() => {
     // Simulate loading
     setLoading(true);
     
     // Find the movie by ID
-    const foundMovie = movies.find((m) => m.id === Number(id));
+    const foundMovie = getMovieById(id || '');
     
     if (foundMovie) {
       setMovie(foundMovie);
@@ -216,7 +216,7 @@ const MovieDetails = () => {
                       </div>
                       <div>
                         <h3 className="font-medium text-gray-500">Director</h3>
-                        <p>Sample Director</p>
+                        <p>{movie.director}</p>
                       </div>
                       <div>
                         <h3 className="font-medium text-gray-500">Language</h3>
@@ -276,17 +276,17 @@ const MovieDetails = () => {
                 
                 <TabsContent value="cast">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {[1, 2, 3, 4, 5, 6].map((actor) => (
-                      <div key={actor} className="text-center">
+                    {movie.cast.map((actor, index) => (
+                      <div key={index} className="text-center">
                         <div className="w-full aspect-square bg-gray-200 rounded-lg mb-2 overflow-hidden">
                           <img 
-                            src={`https://i.pravatar.cc/150?img=${actor + 10}`} 
-                            alt="Actor" 
+                            src={actor.photoUrl} 
+                            alt={actor.name} 
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <h3 className="font-medium">Actor Name {actor}</h3>
-                        <p className="text-sm text-gray-500">Character {actor}</p>
+                        <h3 className="font-medium">{actor.name}</h3>
+                        <p className="text-sm text-gray-500">{actor.character}</p>
                       </div>
                     ))}
                   </div>

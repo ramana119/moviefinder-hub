@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { movies, theaters, showtimes } from "@/data/mockData";
+import { movies, theaters, showtimes, getMovieById, getShowtimeById, getTheaterById } from "@/data/mockData";
 
 interface Seat {
   id: string;
@@ -40,13 +40,13 @@ const SeatSelection = () => {
     setLoading(true);
     
     // Find movie, showtime, and theater
-    const foundMovie = movies.find(m => m.id === Number(movieId));
-    const foundShowtime = showtimes.find(s => s.id === Number(showtimeId));
+    const foundMovie = getMovieById(movieId || '');
+    const foundShowtime = getShowtimeById(showtimeId || '');
     
     if (foundMovie) setMovie(foundMovie);
     if (foundShowtime) {
       setShowtime(foundShowtime);
-      const foundTheater = theaters.find(t => t.id === foundShowtime.theaterId);
+      const foundTheater = getTheaterById(foundShowtime.theaterId);
       if (foundTheater) setTheater(foundTheater);
     }
     

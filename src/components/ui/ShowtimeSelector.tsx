@@ -6,7 +6,7 @@ import { Showtime } from "@/data/mockData";
 
 interface ShowtimeSelectorProps {
   showtimes: Showtime[];
-  movieId: number;
+  movieId: string;
   date: string;
 }
 
@@ -53,12 +53,7 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
               className={`
                 inline-block px-3 py-2 text-xs font-medium rounded border 
                 hover:border-primary hover:text-primary transition-colors
-                ${showtime.availableSeats > 10 
-                  ? "border-green-500 text-green-700" 
-                  : showtime.availableSeats > 0 
-                    ? "border-orange-500 text-orange-700"
-                    : "border-gray-300 text-gray-400 cursor-not-allowed bg-gray-50"
-                }
+                border-green-500 text-green-700
               `}
             >
               {showtime.time}
