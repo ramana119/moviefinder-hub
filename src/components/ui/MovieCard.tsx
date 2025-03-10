@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Star } from "lucide-react";
 import { Movie } from "@/data/mockData";
 
 interface MovieCardProps {
@@ -16,7 +16,7 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ${
+      className={`group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ${
         featured ? "md:col-span-2" : ""
       }`}
     >
@@ -38,8 +38,9 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
           </div>
         </div>
 
-        <div className="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">
-          {movie.rating.toFixed(1)}
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/70 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-full">
+          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          <span>{movie.rating.toFixed(1)}</span>
         </div>
       </Link>
 
