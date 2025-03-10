@@ -3,6 +3,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Showtime } from "@/data/mockData";
+import { Badge } from "./badge";
+import { CalendarCheck, Clock, MapPin } from "lucide-react";
 
 interface ShowtimeSelectorProps {
   showtimes: Showtime[];

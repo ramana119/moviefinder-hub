@@ -1,150 +1,86 @@
 
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Search, User, Menu, X } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useUser } from "@/contexts/UserContext";
+import AuthDialog from "@/components/auth/AuthDialog";
+import LocationSelector from "@/components/ui/LocationSelector";
 
 const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const location = useLocation();
-  const isMobile = useIsMobile();
+  const { user, isAuthenticated, logout } = useUser();
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string>(localStorage.getItem("selectedLocation") || "New York");
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY;
-      if (offset > 50) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    // Close mobile menu when route changes
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
-
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Movies", path: "/movies" },
-    { name: "Theaters", path: "/theaters" },
-    { name: "My Bookings", path: "/dashboard" },
-  ];
-
+  const handleLocationChange = (location: string) => {
+    setSelectedLocation(location);
+    localStorage.setItem("selectedLocation", location);
+  };
+  
   return (
-    <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 120, damping: 20 }}
-      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/80 backdrop-blur-md shadow-md"
-          : "bg-transparent"
-      }`}
-    >
+    <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center">
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              className="font-bold text-2xl text-primary"
-            >
+          <div className="flex items-center">
+            <Link to="/" className="text-2xl font-bold text-primary mr-8">
               CineMagic
-            </motion.div>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`font-medium transition-all hover:text-primary ${
-                  location.pathname === link.path
-                    ? "text-primary"
-                    : scrolled
-                    ? "text-gray-800"
-                    : "text-gray-800"
-                }`}
-              >
-                {link.name}
+            </Link>
+            
+            <nav className="hidden md:flex space-x-6">
+              <Link to="/" className="text-gray-700 hover:text-primary transition-colors">
+                Home
               </Link>
-            ))}
+              <Link to="/dashboard" className="text-gray-700 hover:text-primary transition-colors">
+                My Bookings
+              </Link>
+            </nav>
           </div>
-
-          {/* Right side actions */}
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-primary/10 text-gray-800"
-              aria-label="Search"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-primary/10 text-gray-800"
-              aria-label="Profile"
-            >
-              <User className="h-5 w-5" />
-            </Button>
-
-            {/* Mobile menu toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden hover:bg-primary/10 text-gray-800"
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <X className="h-5 w-5" />
-              ) : (
-                <Menu className="h-5 w-5" />
-              )}
-            </Button>
+          
+          <div className="flex items-center space-x-4">
+            <LocationSelector 
+              selectedLocation={selectedLocation}
+              onLocationChange={handleLocationChange}
+            />
+            
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative rounded-full h-8 w-8 p-0">
+                    <div className="flex h-full w-full items-center justify-center rounded-full bg-primary/10 text-primary">
+                      {user?.name?.charAt(0) || <User size={16} />}
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="p-2 text-sm font-medium border-b">
+                    {user?.name || "User"}
+                  </div>
+                  <DropdownMenuItem asChild>
+                    <Link to="/dashboard" className="cursor-pointer">My Bookings</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setIsAuthDialogOpen(true)}>
+                  Login / Register
+                </Button>
+                <AuthDialog 
+                  isOpen={isAuthDialogOpen}
+                  onClose={() => setIsAuthDialogOpen(false)}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Mobile navigation */}
-      {mobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="md:hidden bg-white shadow-lg"
-        >
-          <div className="px-4 py-5 space-y-5">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`block font-medium transition-all ${
-                  location.pathname === link.path
-                    ? "text-primary"
-                    : "text-gray-800"
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
-          </div>
-        </motion.div>
-      )}
-    </motion.nav>
+    </header>
   );
 };
 

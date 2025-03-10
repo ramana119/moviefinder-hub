@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -8,18 +7,21 @@ import {
   Calendar,
   Clock,
   CircleCheck,
-  Theater,
+  MapPin,
   Ticket,
-  Phone
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import EmailTicket from "@/components/checkout/EmailTicket";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { movies, theaters, showtimes, getMovieById, getShowtimeById, getTheaterById } from "@/data/mockData";
+import { useUser } from "@/contexts/UserContext";
 
 const Checkout = () => {
   const { movieId, showtimeId } = useParams<{ movieId: string; showtimeId: string }>();
@@ -30,6 +32,7 @@ const Checkout = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, isAuthenticated } = useUser();
   
   const [movie, setMovie] = useState(movies[0]);
   const [showtime, setShowtime] = useState(showtimes[0]);
@@ -37,10 +40,12 @@ const Checkout = () => {
   const [loading, setLoading] = useState(true);
   const [isPaymentProcessing, setIsPaymentProcessing] = useState(false);
   const [isBookingComplete, setIsBookingComplete] = useState(false);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(user?.email || "");
   const [phone, setPhone] = useState("");
   const [promoCode, setPromoCode] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [ticketId, setTicketId] = useState("");
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   
   const seatPrice = 150; // In a real app, this would be calculated from the selected seats
   
@@ -58,12 +63,17 @@ const Checkout = () => {
       if (foundTheater) setTheater(foundTheater);
     }
     
+    // Populate email from user context if available
+    if (user?.email) {
+      setEmail(user.email);
+    }
+    
     const timer = setTimeout(() => {
       setLoading(false);
     }, 800);
     
     return () => clearTimeout(timer);
-  }, [movieId, showtimeId]);
+  }, [movieId, showtimeId, user]);
   
   const calculateTotal = () => {
     const baseTotal = selectedSeatIds.length * seatPrice;
@@ -92,7 +102,8 @@ const Checkout = () => {
       setIsPaymentProcessing(false);
       setIsBookingComplete(true);
       
-      // In a real app, you would save the booking to the database here
+      // Generate a random ticket ID
+      setTicketId(`CIN${Math.floor(Math.random() * 10000000)}`);
       
       toast({
         title: "Booking successful!",
@@ -138,7 +149,7 @@ const Checkout = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-semibold">Booking ID</div>
-                    <div className="text-gray-600">#CIN{Math.floor(Math.random() * 10000000)}</div>
+                    <div className="text-gray-600">#{ticketId}</div>
                   </div>
                 </div>
                 
@@ -154,7 +165,7 @@ const Checkout = () => {
                     <div className="text-gray-600">{showtime.time}</div>
                   </div>
                   <div className="bg-white p-4 rounded-lg">
-                    <Theater className="w-5 h-5 mx-auto mb-2 text-primary" />
+                    <MapPin className="w-5 h-5 mx-auto mb-2 text-primary" />
                     <div className="font-medium">Theater</div>
                     <div className="text-gray-600">{theater.name}</div>
                   </div>
@@ -184,6 +195,26 @@ const Checkout = () => {
                     Download Ticket
                   </a>
                 </Button>
+                <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      <Mail className="w-4 h-4 mr-2" />
+                      Email Ticket
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Send Ticket via Email</DialogTitle>
+                    </DialogHeader>
+                    <EmailTicket 
+                      ticketId={ticketId}
+                      movieTitle={movie.title}
+                      showtime={showtime.time}
+                      date={date}
+                      defaultEmail={email}
+                    />
+                  </DialogContent>
+                </Dialog>
                 <Button variant="outline" onClick={() => navigate("/dashboard")}>
                   View My Bookings
                 </Button>
@@ -241,7 +272,7 @@ const Checkout = () => {
                         <span>{showtime.time}</span>
                       </div>
                       <div className="flex items-center col-span-2 mt-1">
-                        <Theater className="w-4 h-4 mr-1 text-gray-500" />
+                        <MapPin className="w-4 h-4 mr-1 text-gray-500" />
                         <span>{theater.name}, {theater.location}</span>
                       </div>
                     </div>

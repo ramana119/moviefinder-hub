@@ -9,8 +9,12 @@ import {
   Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/contexts/UserContext";
+import AuthDialog from "@/components/auth/AuthDialog";
 import { movies, theaters, showtimes, getMovieById, getShowtimeById, getTheaterById } from "@/data/mockData";
 
 interface Seat {
@@ -28,6 +32,8 @@ const SeatSelection = () => {
   const date = searchParams.get("date") || "";
   
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { isAuthenticated } = useUser();
   
   const [movie, setMovie] = useState(movies[0]);
   const [showtime, setShowtime] = useState(showtimes[0]);
@@ -35,6 +41,7 @@ const SeatSelection = () => {
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   
   useEffect(() => {
     setLoading(true);
@@ -126,7 +133,19 @@ const SeatSelection = () => {
   };
   
   const handleProceed = () => {
-    if (selectedSeats.length === 0) return;
+    if (selectedSeats.length === 0) {
+      toast({
+        title: "No seats selected",
+        description: "Please select at least one seat to proceed",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!isAuthenticated) {
+      setIsAuthDialogOpen(true);
+      return;
+    }
     
     // In a real app, you would save the booking details to context/state
     // and then redirect to the checkout page
@@ -282,6 +301,11 @@ const SeatSelection = () => {
           </Button>
         </div>
       </div>
+      
+      <AuthDialog
+        isOpen={isAuthDialogOpen}
+        onClose={() => setIsAuthDialogOpen(false)}
+      />
       
       <Footer />
     </div>

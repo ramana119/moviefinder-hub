@@ -8,20 +8,23 @@ import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import "./App.css";
 import { Toaster } from "@/components/ui/toaster";
+import { UserProvider } from "./contexts/UserContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/movie/:id" element={<MovieDetails />} />
-        <Route path="/booking/:movieId/:showtimeId" element={<SeatSelection />} />
-        <Route path="/checkout/:movieId/:showtimeId" element={<Checkout />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Toaster />
-    </BrowserRouter>
+    <UserProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/movie/:id" element={<MovieDetails />} />
+          <Route path="/booking/:movieId/:showtimeId" element={<SeatSelection />} />
+          <Route path="/checkout/:movieId/:showtimeId" element={<Checkout />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </BrowserRouter>
+    </UserProvider>
   );
 }
 
