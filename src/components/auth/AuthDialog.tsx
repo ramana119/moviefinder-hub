@@ -1,6 +1,9 @@
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserAuth from "./UserAuth";
+import UserProfile from "./UserProfile";
 import { useUser } from "@/contexts/UserContext";
 
 interface AuthDialogProps {
@@ -9,16 +12,21 @@ interface AuthDialogProps {
 }
 
 const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
-  const { login, signup } = useUser();
+  const { user, isAuthenticated, login, signup, logout } = useUser();
+  const [activeTab, setActiveTab] = useState<string>("login");
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md p-0">
-        <UserAuth
-          onLogin={login}
-          onSignup={signup}
-          onClose={onClose}
-        />
+        {isAuthenticated ? (
+          <UserProfile user={user} onLogout={logout} onClose={onClose} />
+        ) : (
+          <UserAuth
+            onLogin={login}
+            onSignup={signup}
+            onClose={onClose}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

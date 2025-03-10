@@ -207,43 +207,43 @@ const SeatSelection = () => {
             {/* Seat legend */}
             <div className="flex justify-center gap-6 mb-8">
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-gray-200 rounded mr-2"></div>
-                <span className="text-sm">Available</span>
+                <div className="w-3 h-3 bg-gray-200 rounded mr-2"></div>
+                <span className="text-xs">Available</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-primary rounded mr-2"></div>
-                <span className="text-sm">Selected</span>
+                <div className="w-3 h-3 bg-primary rounded mr-2"></div>
+                <span className="text-xs">Selected</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 bg-gray-400 rounded mr-2"></div>
-                <span className="text-sm">Booked</span>
+                <div className="w-3 h-3 bg-gray-400 rounded mr-2"></div>
+                <span className="text-xs">Booked</span>
               </div>
             </div>
             
             {/* Price legend */}
             <div className="flex justify-center gap-6 mb-8">
               <div className="flex items-center">
-                <div className="w-4 h-4 border border-gray-300 rounded mr-2"></div>
-                <span className="text-sm">Regular (₹150)</span>
+                <div className="w-3 h-3 border border-gray-300 rounded mr-2"></div>
+                <span className="text-xs">Regular (₹150)</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 border border-blue-300 rounded mr-2"></div>
-                <span className="text-sm">Premium (₹250)</span>
+                <div className="w-3 h-3 border border-blue-300 rounded mr-2"></div>
+                <span className="text-xs">Premium (₹250)</span>
               </div>
               <div className="flex items-center">
-                <div className="w-4 h-4 border border-violet-300 rounded mr-2"></div>
-                <span className="text-sm">VIP (₹350)</span>
+                <div className="w-3 h-3 border border-violet-300 rounded mr-2"></div>
+                <span className="text-xs">VIP (₹350)</span>
               </div>
             </div>
             
-            {/* Seat grid */}
-            <div className="grid grid-rows-10 gap-y-2 mb-8">
+            {/* Seat grid - UPDATED with smaller seats */}
+            <div className="grid grid-rows-10 gap-y-1 mb-8">
               {Array.from(new Set(seats.map(seat => seat.row))).map(row => (
                 <div key={row} className="flex items-center">
-                  <div className="w-6 text-center text-gray-500 font-medium mr-2">
+                  <div className="w-4 text-center text-gray-500 text-xs font-medium mr-1">
                     {row}
                   </div>
-                  <div className="flex-1 grid grid-cols-16 gap-x-1">
+                  <div className="flex-1 grid grid-cols-18 gap-x-0.5">
                     {seats
                       .filter(seat => seat.row === row)
                       .sort((a, b) => a.number - b.number)
@@ -253,12 +253,12 @@ const SeatSelection = () => {
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                           className={`
-                            w-full aspect-[4/3] rounded-t-md flex items-center justify-center text-xs
+                            w-full aspect-square rounded-sm flex items-center justify-center text-[10px]
                             ${seat.status === "booked" ? "bg-gray-400 cursor-not-allowed" : ""}
                             ${seat.status === "selected" ? "bg-primary text-white" : ""}
                             ${seat.status === "available" ? "bg-gray-200 hover:bg-gray-300" : ""}
-                            ${seat.type === "premium" ? "border-2 border-blue-300" : ""}
-                            ${seat.type === "vip" ? "border-2 border-violet-300" : ""}
+                            ${seat.type === "premium" ? "border border-blue-300" : ""}
+                            ${seat.type === "vip" ? "border border-violet-300" : ""}
                             ${seat.type === "regular" ? "border border-gray-300" : ""}
                           `}
                           onClick={() => handleSeatClick(seat)}
@@ -268,7 +268,7 @@ const SeatSelection = () => {
                         </motion.button>
                       ))}
                   </div>
-                  <div className="w-6 text-center text-gray-500 font-medium ml-2">
+                  <div className="w-4 text-center text-gray-500 text-xs font-medium ml-1">
                     {row}
                   </div>
                 </div>
