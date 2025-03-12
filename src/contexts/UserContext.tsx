@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "@/components/auth/UserAuth";
@@ -11,6 +12,8 @@ interface UserContextType {
   logout: () => void;
   redirectToLogin: () => void;
   requireAuth: () => boolean;
+  updateProfile: (userData: Partial<UserData>) => void;
+  verifyEmail: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -42,13 +45,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signup = (userData: UserData) => {
-    setUser(userData);
+    // In a real app, you would store this in a database
+    const newUser = {...userData, verified: false};
+    setUser(newUser);
     setIsAuthenticated(true);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("user", JSON.stringify(newUser));
     
     toast({
       title: "Account created",
-      description: "Your account has been created successfully",
+      description: "Your account has been created successfully. Please verify your email.",
+      variant: "default",
     });
   };
 
@@ -87,7 +93,49 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       redirectToLogin();
       return false;
     }
+    
+    // Check if profile is complete with name, email, and phone
+    if (user && (!user.name || !user.email || !user.phone)) {
+      toast({
+        title: "Complete Your Profile",
+        description: "Please complete your profile before proceeding.",
+        variant: "destructive",
+      });
+      
+      // Trigger the profile dialog
+      const event = new CustomEvent('openAuthDialog');
+      window.dispatchEvent(event);
+      return false;
+    }
+    
     return true;
+  };
+
+  const updateProfile = (userData: Partial<UserData>) => {
+    if (user) {
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully",
+      });
+    }
+  };
+
+  const verifyEmail = () => {
+    if (user) {
+      const verifiedUser = { ...user, verified: true };
+      setUser(verifiedUser);
+      localStorage.setItem("user", JSON.stringify(verifiedUser));
+      
+      toast({
+        title: "Email Verified",
+        description: "Your email has been verified successfully",
+        variant: "default",
+      });
+    }
   };
 
   return (
@@ -98,7 +146,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       signup, 
       logout,
       redirectToLogin,
-      requireAuth 
+      requireAuth,
+      updateProfile,
+      verifyEmail
     }}>
       {children}
     </UserContext.Provider>

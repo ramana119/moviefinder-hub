@@ -113,12 +113,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-gradient-to-b from-indigo-50 to-white rounded-lg shadow-xl w-full max-w-md p-6"
+      className="bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 rounded-lg shadow-xl w-full max-w-md p-6"
     >
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-2 mb-6 bg-indigo-100">
-          <TabsTrigger value="login" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Login</TabsTrigger>
-          <TabsTrigger value="signup" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
+          <TabsTrigger value="login" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Login</TabsTrigger>
+          <TabsTrigger value="signup" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white">Sign Up</TabsTrigger>
         </TabsList>
         
         <TabsContent value="login">
@@ -126,12 +126,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="login-email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="login-email"
                   type="email"
                   placeholder="Your email"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={loginData.email}
                   onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                 />
@@ -141,19 +141,19 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="login-password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="login-password"
                   type="password"
                   placeholder="Your password"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={loginData.password}
                   onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                 />
               </div>
             </div>
             
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent" />
@@ -174,12 +174,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="signup-name">Full Name</Label>
               <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <User className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="signup-name"
                   type="text"
                   placeholder="Your full name"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={signupData.name}
                   onChange={(e) => setSignupData({...signupData, name: e.target.value})}
                 />
@@ -189,12 +189,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="signup-email">Email</Label>
               <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="signup-email"
                   type="email"
                   placeholder="Your email"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={signupData.email}
                   onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                 />
@@ -204,12 +204,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="signup-phone">Phone Number</Label>
               <div className="relative">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="signup-phone"
                   type="tel"
                   placeholder="Your phone number"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={signupData.phone}
                   onChange={(e) => setSignupData({...signupData, phone: e.target.value})}
                 />
@@ -219,12 +219,12 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
             <div className="space-y-2">
               <Label htmlFor="signup-password">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-indigo-400" />
+                <Lock className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
                 <Input
                   id="signup-password"
                   type="password"
                   placeholder="Create a password"
-                  className="pl-10 border-indigo-200 focus:border-indigo-400"
+                  className="pl-10 border-purple-200 focus:border-purple-400"
                   value={signupData.password}
                   onChange={(e) => setSignupData({...signupData, password: e.target.value})}
                 />
@@ -241,11 +241,11 @@ const UserAuth = ({ onLogin, onSignup, onClose }: UserAuthProps) => {
                 htmlFor="terms"
                 className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                I accept the <a href="#" className="text-indigo-600 hover:underline">Terms of Service</a> and <a href="#" className="text-indigo-600 hover:underline">Privacy Policy</a>
+                I accept the <a href="#" className="text-purple-600 hover:underline">Terms of Service</a> and <a href="#" className="text-purple-600 hover:underline">Privacy Policy</a>
               </label>
             </div>
             
-            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent" />

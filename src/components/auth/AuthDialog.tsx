@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UserAuth from "./UserAuth";
@@ -17,7 +17,7 @@ const AuthDialog = ({ isOpen, onClose }: AuthDialogProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md p-0">
+      <DialogContent className="sm:max-w-md p-0 bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
         {isAuthenticated ? (
           <UserProfile user={user} onLogout={logout} onClose={onClose} />
         ) : (

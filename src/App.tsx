@@ -14,15 +14,17 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/movie/:id" element={<MovieDetails />} />
-          <Route path="/booking/:movieId/:showtimeId" element={<SeatSelection />} />
-          <Route path="/checkout/:movieId/:showtimeId" element={<Checkout />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Toaster />
+        <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/movie/:id" element={<MovieDetails />} />
+            <Route path="/booking/:movieId/:showtimeId" element={<SeatSelection />} />
+            <Route path="/checkout/:movieId/:showtimeId" element={<Checkout />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <Toaster />
+        </div>
       </UserProvider>
     </BrowserRouter>
   );

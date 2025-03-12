@@ -8,7 +8,8 @@ import {
   Ticket,
   Settings,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  SendIcon
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserData } from "./UserAuth";
 import BookingHistory from "./BookingHistory";
 import { Badge } from "@/components/ui/badge";
+import { useUser } from "@/contexts/UserContext";
 
 interface UserProfileProps {
   user: UserData | null;
@@ -26,10 +28,15 @@ interface UserProfileProps {
 
 const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
   const [activeTab, setActiveTab] = useState<string>("profile");
+  const { verifyEmail } = useUser();
   
   const handleLogout = () => {
     onLogout();
     onClose();
+  };
+  
+  const handleVerifyEmail = () => {
+    verifyEmail();
   };
   
   if (!user) return null;
@@ -41,9 +48,9 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
     .toUpperCase();
   
   return (
-    <div className="p-6 bg-gradient-to-b from-indigo-50 to-white">
+    <div className="p-6 bg-gradient-to-b from-purple-50 to-indigo-50">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-indigo-800">My Account</h2>
+        <h2 className="text-xl font-bold text-purple-800">My Account</h2>
         <Button
           variant="outline"
           size="sm"
@@ -61,12 +68,12 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-2 mb-6 bg-indigo-100">
-          <TabsTrigger value="profile" className="flex gap-1 items-center data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+        <TabsList className="grid grid-cols-2 mb-6 bg-purple-100">
+          <TabsTrigger value="profile" className="flex gap-1 items-center data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <User className="w-4 h-4" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="bookings" className="flex gap-1 items-center data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
+          <TabsTrigger value="bookings" className="flex gap-1 items-center data-[state=active]:bg-purple-600 data-[state=active]:text-white">
             <Ticket className="w-4 h-4" />
             Bookings
           </TabsTrigger>
@@ -74,8 +81,8 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
         
         <TabsContent value="profile" className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-            <Avatar className="w-20 h-20 border-2 border-indigo-200">
-              <AvatarFallback className="text-xl bg-indigo-600 text-white">
+            <Avatar className="w-20 h-20 border-2 border-purple-200">
+              <AvatarFallback className="text-xl bg-purple-600 text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
@@ -89,19 +96,29 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
                     <CheckCircle className="h-3 w-3" /> Verified
                   </Badge>
                 ) : (
-                  <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 flex items-center gap-1">
-                    <AlertCircle className="h-3 w-3" /> Unverified
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" /> Unverified
+                    </Badge>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-6 text-xs bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"
+                      onClick={handleVerifyEmail}
+                    >
+                      <SendIcon className="h-3 w-3 mr-1" /> Verify Now
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
           </div>
           
-          <Separator className="bg-indigo-100" />
+          <Separator className="bg-purple-100" />
           
           <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-indigo-500" />
+              <Mail className="w-4 h-4 text-purple-500" />
               <div>
                 <p className="text-sm font-medium">Email</p>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
@@ -109,7 +126,7 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Phone className="w-4 h-4 text-indigo-500" />
+              <Phone className="w-4 h-4 text-purple-500" />
               <div>
                 <p className="text-sm font-medium">Phone</p>
                 <p className="text-sm text-muted-foreground">{user.phone || "Not provided"}</p>
@@ -119,7 +136,7 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
           
           <div className="pt-4">
             <Button
-              className="w-full gap-1 bg-indigo-600 hover:bg-indigo-700"
+              className="w-full gap-1 bg-purple-600 hover:bg-purple-700"
             >
               <Settings className="w-4 h-4" />
               Edit Profile
