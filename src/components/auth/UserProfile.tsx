@@ -98,7 +98,7 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
               <Phone className="w-4 h-4 text-muted-foreground" />
               <div>
                 <p className="text-sm font-medium">Phone</p>
-                <p className="text-sm text-muted-foreground">{user.phone || "Not provided"}</p>
+                <p className="text-sm text-muted-foreground">Not provided</p>
               </div>
             </div>
           </div>

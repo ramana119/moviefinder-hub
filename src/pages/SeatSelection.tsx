@@ -69,13 +69,13 @@ const SeatSelection = () => {
   
   const generateSeats = () => {
     const seatRows = ["A", "B", "C", "D", "E", "F", "G", "H", "J", "K"];
-    const seatsPerRow = 16;
+    const seatsPerRow = 20; // Increased number of seats per row
     const generatedSeats: Seat[] = [];
     
     seatRows.forEach(row => {
       for (let i = 1; i <= seatsPerRow; i++) {
         // Skip some seats to create walking space in the middle
-        if (i === 5 || i === 12) continue;
+        if (i === 6 || i === 15) continue;
         
         // Determine seat type and price
         let type: "regular" | "premium" | "vip" = "regular";
@@ -164,10 +164,10 @@ const SeatSelection = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <main className="flex-1 bg-gray-50 pt-10 pb-20">
+      <main className="flex-1 bg-gray-50 pt-6 pb-20">
         <div className="container mx-auto px-4 sm:px-6">
           {/* Header with basic info */}
-          <div className="flex items-center mb-6">
+          <div className="flex items-center mb-4">
             <Button
               variant="ghost"
               size="sm"
@@ -177,16 +177,16 @@ const SeatSelection = () => {
               <ArrowLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
-            <h1 className="text-2xl font-bold">{movie.title}</h1>
+            <h1 className="text-xl font-bold">{movie.title}</h1>
           </div>
           
-          <div className="flex flex-wrap gap-4 mb-8 text-sm">
+          <div className="flex flex-wrap gap-4 mb-4 text-xs">
             <div className="flex items-center">
-              <Calendar className="w-4 h-4 mr-1" />
+              <Calendar className="w-3 h-3 mr-1" />
               <span>{date}</span>
             </div>
             <div className="flex items-center">
-              <Clock className="w-4 h-4 mr-1" />
+              <Clock className="w-3 h-3 mr-1" />
               <span>{showtime.time}</span>
             </div>
             <div>
@@ -196,64 +196,64 @@ const SeatSelection = () => {
           </div>
           
           {/* Seat map */}
-          <div className="max-w-4xl mx-auto mb-12">
+          <div className="max-w-5xl mx-auto mb-8">
             {/* Screen */}
-            <div className="relative mb-16">
-              <div className="h-8 bg-gradient-to-b from-gray-300 to-transparent rounded-t-lg mb-1"></div>
+            <div className="relative mb-10">
+              <div className="h-6 bg-gradient-to-b from-gray-300 to-transparent rounded-t-lg mb-1"></div>
               <div className="h-1 bg-gray-400 w-full rounded-full"></div>
-              <p className="absolute top-full left-1/2 transform -translate-x-1/2 text-gray-500 text-sm mt-2">SCREEN</p>
+              <p className="absolute top-full left-1/2 transform -translate-x-1/2 text-gray-500 text-xs mt-1">SCREEN</p>
             </div>
             
             {/* Seat legend */}
-            <div className="flex justify-center gap-6 mb-8">
+            <div className="flex justify-center gap-4 mb-4 text-[10px]">
               <div className="flex items-center">
-                <div className="w-3 h-3 bg-gray-200 rounded mr-2"></div>
-                <span className="text-xs">Available</span>
+                <div className="w-2 h-2 bg-gray-200 rounded mr-1"></div>
+                <span>Available</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 bg-primary rounded mr-2"></div>
-                <span className="text-xs">Selected</span>
+                <div className="w-2 h-2 bg-primary rounded mr-1"></div>
+                <span>Selected</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 bg-gray-400 rounded mr-2"></div>
-                <span className="text-xs">Booked</span>
+                <div className="w-2 h-2 bg-gray-400 rounded mr-1"></div>
+                <span>Booked</span>
               </div>
             </div>
             
             {/* Price legend */}
-            <div className="flex justify-center gap-6 mb-8">
+            <div className="flex justify-center gap-4 mb-6 text-[10px]">
               <div className="flex items-center">
-                <div className="w-3 h-3 border border-gray-300 rounded mr-2"></div>
-                <span className="text-xs">Regular (₹150)</span>
+                <div className="w-2 h-2 border border-gray-300 rounded mr-1"></div>
+                <span>Regular (₹150)</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 border border-blue-300 rounded mr-2"></div>
-                <span className="text-xs">Premium (₹250)</span>
+                <div className="w-2 h-2 border border-blue-300 rounded mr-1"></div>
+                <span>Premium (₹250)</span>
               </div>
               <div className="flex items-center">
-                <div className="w-3 h-3 border border-violet-300 rounded mr-2"></div>
-                <span className="text-xs">VIP (₹350)</span>
+                <div className="w-2 h-2 border border-violet-300 rounded mr-1"></div>
+                <span>VIP (₹350)</span>
               </div>
             </div>
             
-            {/* Seat grid - UPDATED with smaller seats */}
-            <div className="grid grid-rows-10 gap-y-1 mb-8">
+            {/* Seat grid - Much smaller seats with tighter spacing */}
+            <div className="grid grid-rows-10 gap-y-0.5 mb-8 overflow-x-auto">
               {Array.from(new Set(seats.map(seat => seat.row))).map(row => (
                 <div key={row} className="flex items-center">
-                  <div className="w-4 text-center text-gray-500 text-xs font-medium mr-1">
+                  <div className="w-3 text-center text-gray-500 text-[8px] font-medium mr-0.5">
                     {row}
                   </div>
-                  <div className="flex-1 grid grid-cols-18 gap-x-0.5">
+                  <div className="flex-1 grid grid-cols-[repeat(20,minmax(0,1fr))] gap-x-0.5">
                     {seats
                       .filter(seat => seat.row === row)
                       .sort((a, b) => a.number - b.number)
                       .map(seat => (
                         <motion.button
                           key={seat.id}
-                          whileHover={{ scale: 1.05 }}
+                          whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.95 }}
                           className={`
-                            w-full aspect-square rounded-sm flex items-center justify-center text-[10px]
+                            w-4 h-4 min-w-4 rounded-[2px] flex items-center justify-center text-[6px]
                             ${seat.status === "booked" ? "bg-gray-400 cursor-not-allowed" : ""}
                             ${seat.status === "selected" ? "bg-primary text-white" : ""}
                             ${seat.status === "available" ? "bg-gray-200 hover:bg-gray-300" : ""}
@@ -268,7 +268,7 @@ const SeatSelection = () => {
                         </motion.button>
                       ))}
                   </div>
-                  <div className="w-4 text-center text-gray-500 text-xs font-medium ml-1">
+                  <div className="w-3 text-center text-gray-500 text-[8px] font-medium ml-0.5">
                     {row}
                   </div>
                 </div>
@@ -279,14 +279,14 @@ const SeatSelection = () => {
       </main>
       
       {/* Floating bottom bar with summary */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t p-4">
+      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t p-3">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center">
-          <div className="mb-4 sm:mb-0">
-            <p className="text-gray-500 text-sm">Selected Seats: {selectedSeats.length}</p>
-            <div className="font-bold text-xl">Total: ₹{getTotal().toLocaleString()}</div>
+          <div className="mb-3 sm:mb-0">
+            <p className="text-gray-500 text-xs">Selected Seats: {selectedSeats.length}</p>
+            <div className="font-bold text-lg">Total: ₹{getTotal().toLocaleString()}</div>
             <div className="flex flex-wrap gap-1 mt-1">
               {selectedSeats.map(seat => (
-                <span key={seat.id} className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <span key={seat.id} className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded">
                   {seat.id}
                 </span>
               ))}
