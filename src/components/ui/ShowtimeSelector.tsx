@@ -23,7 +23,12 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
     ? showtimes.filter(s => s.format === selectedFormat)
     : showtimes;
 
-  const handleShowtimeClick = (e: React.MouseEvent, showtimeId: string) => {
+  const handleShowtimeClick = (e: React.MouseEvent, showtimeId: string, available: boolean) => {
+    if (!available) {
+      e.preventDefault();
+      return;
+    }
+    
     if (!isAuthenticated) {
       e.preventDefault();
       redirectToLogin();
@@ -31,7 +36,7 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
   };
 
   return (
-    <div>
+    <div className="p-4 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg">
       {/* Format filter */}
       {formats.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-3">
@@ -40,8 +45,8 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
               key={format}
               className={`px-3 py-1 text-xs rounded-full transition ${
                 selectedFormat === format
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-800"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-white hover:bg-indigo-100 text-indigo-800 border border-indigo-200"
               }`}
               onClick={() => setSelectedFormat(format === selectedFormat ? null : format)}
             >
@@ -61,11 +66,13 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
           >
             <Link
               to={`/booking/${movieId}/${showtime.id}?date=${date}`}
-              onClick={(e) => handleShowtimeClick(e, showtime.id)}
+              onClick={(e) => handleShowtimeClick(e, showtime.id, showtime.available)}
               className={`
-                inline-block px-3 py-2 text-xs font-medium rounded border 
-                hover:border-primary hover:text-primary transition-colors
-                ${showtime.available !== false ? 'border-green-500 text-green-700' : 'border-gray-300 text-gray-400 cursor-not-allowed'}
+                inline-block px-4 py-2 text-xs font-medium rounded border 
+                hover:border-indigo-500 transition-colors
+                ${showtime.available 
+                  ? 'bg-white border-indigo-300 text-indigo-700 hover:bg-indigo-50' 
+                  : 'bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed'}
               `}
             >
               {showtime.time}
@@ -74,7 +81,7 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
         ))}
         
         {filteredShowtimes.length === 0 && (
-          <p className="text-sm text-gray-500 py-2">No showtimes available for this selection.</p>
+          <p className="text-sm text-indigo-500 py-2">No showtimes available for this selection.</p>
         )}
       </div>
     </div>

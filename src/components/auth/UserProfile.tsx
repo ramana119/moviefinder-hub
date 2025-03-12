@@ -6,7 +6,9 @@ import {
   Phone, 
   LogOut, 
   Ticket,
-  Settings
+  Settings,
+  CheckCircle,
+  AlertCircle
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,6 +16,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { UserData } from "./UserAuth";
 import BookingHistory from "./BookingHistory";
+import { Badge } from "@/components/ui/badge";
 
 interface UserProfileProps {
   user: UserData | null;
@@ -38,14 +41,14 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
     .toUpperCase();
   
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gradient-to-b from-indigo-50 to-white">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold">My Account</h2>
+        <h2 className="text-xl font-bold text-indigo-800">My Account</h2>
         <Button
           variant="outline"
           size="sm"
           onClick={handleLogout}
-          className="gap-1"
+          className="gap-1 border-red-200 text-red-600 hover:bg-red-50"
         >
           <LogOut className="w-4 h-4" />
           Logout
@@ -58,12 +61,12 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
         onValueChange={setActiveTab}
         className="w-full"
       >
-        <TabsList className="grid grid-cols-2 mb-6">
-          <TabsTrigger value="profile" className="flex gap-1 items-center">
+        <TabsList className="grid grid-cols-2 mb-6 bg-indigo-100">
+          <TabsTrigger value="profile" className="flex gap-1 items-center data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <User className="w-4 h-4" />
             Profile
           </TabsTrigger>
-          <TabsTrigger value="bookings" className="flex gap-1 items-center">
+          <TabsTrigger value="bookings" className="flex gap-1 items-center data-[state=active]:bg-indigo-600 data-[state=active]:text-white">
             <Ticket className="w-4 h-4" />
             Bookings
           </TabsTrigger>
@@ -71,23 +74,34 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
         
         <TabsContent value="profile" className="space-y-6">
           <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-            <Avatar className="w-20 h-20">
-              <AvatarFallback className="text-xl bg-primary text-primary-foreground">
+            <Avatar className="w-20 h-20 border-2 border-indigo-200">
+              <AvatarFallback className="text-xl bg-indigo-600 text-white">
                 {initials}
               </AvatarFallback>
             </Avatar>
             
             <div className="space-y-1 text-center sm:text-left">
               <h3 className="text-lg font-semibold">{user.name}</h3>
-              <p className="text-sm text-muted-foreground">Member since {new Date().getFullYear()}</p>
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <p className="text-sm text-muted-foreground">Member since {new Date().getFullYear()}</p>
+                {user.verified ? (
+                  <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 flex items-center gap-1">
+                    <CheckCircle className="h-3 w-3" /> Verified
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" /> Unverified
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
           
-          <Separator />
+          <Separator className="bg-indigo-100" />
           
-          <div className="space-y-4">
+          <div className="space-y-4 bg-white p-4 rounded-lg shadow-sm">
             <div className="flex items-center gap-3">
-              <Mail className="w-4 h-4 text-muted-foreground" />
+              <Mail className="w-4 h-4 text-indigo-500" />
               <div>
                 <p className="text-sm font-medium">Email</p>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
@@ -95,19 +109,17 @@ const UserProfile = ({ user, onLogout, onClose }: UserProfileProps) => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Phone className="w-4 h-4 text-muted-foreground" />
+              <Phone className="w-4 h-4 text-indigo-500" />
               <div>
                 <p className="text-sm font-medium">Phone</p>
-                <p className="text-sm text-muted-foreground">Not provided</p>
+                <p className="text-sm text-muted-foreground">{user.phone || "Not provided"}</p>
               </div>
             </div>
           </div>
           
           <div className="pt-4">
             <Button
-              variant="outline"
-              size="sm"
-              className="w-full gap-1"
+              className="w-full gap-1 bg-indigo-600 hover:bg-indigo-700"
             >
               <Settings className="w-4 h-4" />
               Edit Profile

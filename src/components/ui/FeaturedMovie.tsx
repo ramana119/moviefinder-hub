@@ -26,6 +26,14 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
     setCurrentIndex(index);
   };
 
+  if (!currentMovie) {
+    return (
+      <div className="relative w-full h-[70vh] bg-indigo-900 flex items-center justify-center">
+        <p className="text-white text-xl">Loading featured movies...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-[70vh] overflow-hidden">
       <AnimatePresence mode="wait">
@@ -39,7 +47,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
         >
           {/* Background Image with overlay */}
           <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-black opacity-70 z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-indigo-900/50 to-black/80 z-10"></div>
             <div
               className="absolute inset-0 z-0 bg-cover bg-center"
               style={{
@@ -53,7 +61,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
           <div className="relative z-30 container mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
             <div className="max-w-3xl mt-20">
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-xs sm:text-sm px-3 py-1.5 bg-primary/20 text-primary font-medium rounded-full backdrop-blur-sm">
+                <span className="text-xs sm:text-sm px-3 py-1.5 bg-indigo-500/80 text-white font-medium rounded-full backdrop-blur-sm">
                   Now Showing
                 </span>
                 <div className="flex items-center gap-2 text-white/80 text-xs sm:text-sm">
@@ -84,7 +92,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
                 {currentMovie.genre.map((genre, index) => (
                   <span
                     key={index}
-                    className="text-xs sm:text-sm px-3 py-1 bg-white/10 text-white rounded-full backdrop-blur-sm"
+                    className="text-xs sm:text-sm px-3 py-1 bg-indigo-600/70 text-white rounded-full backdrop-blur-sm"
                   >
                     {genre}
                   </span>
@@ -120,7 +128,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
               >
                 <Button
                   size="lg"
-                  className="font-medium rounded-full"
+                  className="font-medium rounded-full bg-indigo-600 hover:bg-indigo-700"
                   asChild
                 >
                   <Link to={`/movie/${currentMovie.id}`}>
@@ -155,7 +163,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
             key={index}
             onClick={() => handleIndicatorClick(index)}
             className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? "w-8 bg-primary" : "w-2 bg-white/50"
+              index === currentIndex ? "w-8 bg-indigo-600" : "w-2 bg-white/50"
             }`}
             aria-label={`View slide ${index + 1}`}
           />
