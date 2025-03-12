@@ -12,8 +12,8 @@ import { UserProvider } from "./contexts/UserContext";
 
 function App() {
   return (
-    <UserProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <UserProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
@@ -23,8 +23,8 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
-      </BrowserRouter>
-    </UserProvider>
+      </UserProvider>
+    </BrowserRouter>
   );
 }
 

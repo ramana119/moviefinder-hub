@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserData } from "@/components/auth/UserAuth";
@@ -35,18 +34,33 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(userData));
+    
+    toast({
+      title: "Welcome back!",
+      description: `You're now logged in as ${userData.name}`,
+    });
   };
 
   const signup = (userData: UserData) => {
     setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem("user", JSON.stringify(userData));
+    
+    toast({
+      title: "Account created",
+      description: "Your account has been created successfully",
+    });
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem("user");
+    
+    toast({
+      title: "Logged out",
+      description: "You have been logged out successfully",
+    });
   };
 
   const redirectToLogin = () => {
@@ -55,7 +69,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       description: "Please log in to continue.",
       variant: "destructive",
     });
-    navigate("/");
+    
+    // If already on the homepage, just trigger the login dialog
+    // Otherwise, navigate to the homepage first
+    if (window.location.pathname !== '/') {
+      navigate("/");
+    }
+    
     // Trigger the authentication dialog from Navbar
     const event = new CustomEvent('openAuthDialog');
     window.dispatchEvent(event);

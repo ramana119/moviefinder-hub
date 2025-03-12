@@ -1,4 +1,3 @@
-
 export interface Movie {
   id: string;
   title: string;
@@ -40,6 +39,7 @@ export interface Showtime {
     premium: number;
     vip: number;
   };
+  available?: boolean;
 }
 
 export interface User {
@@ -75,124 +75,204 @@ export interface Booking {
 export const movies: Movie[] = [
   {
     id: '1',
-    title: 'Interstellar',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/pbrkL804c8yAv3zBZR4QPEafpAR.jpg',
-    releaseDate: '2023-11-05',
-    duration: '2h 49m',
-    genre: ['Sci-Fi', 'Adventure', 'Drama'],
-    language: 'English',
-    rating: 8.6,
-    description: 'When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.',
-    trailerUrl: 'https://www.youtube.com/embed/zSWdZVtXT7E',
+    title: 'RRR',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/nEufeZlyAOLqO2brrs0yeF1lgXO.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/z9a3e9d2UIQ2kEiSQdFbmGMZ4hx.jpg',
+    releaseDate: '2022-03-24',
+    duration: '3h 7m',
+    genre: ['Action', 'Drama', 'Historical'],
+    language: 'Telugu',
+    rating: 8.8,
+    description: 'A fictional story about two legendary revolutionaries and their journey away from home before they started fighting for their country in the 1920s.',
+    trailerUrl: 'https://www.youtube.com/embed/f_vbAtFSEc0',
     cast: [
-      { name: 'Matthew McConaughey', character: 'Joseph Cooper', photoUrl: 'https://image.tmdb.org/t/p/w200/e9ZHRY5toihZRFe2uYe1KQrf0o6.jpg' },
-      { name: 'Anne Hathaway', character: 'Dr. Amelia Brand', photoUrl: 'https://image.tmdb.org/t/p/w200/tLelKoPNiyJCSEtQTz1FGrfqwkP.jpg' },
-      { name: 'Jessica Chastain', character: 'Murphy Cooper', photoUrl: 'https://image.tmdb.org/t/p/w200/lCiUTJWbkMHZKVQqCgX68wAAOhn.jpg' }
+      { name: 'Ram Charan', character: 'Alluri Sitarama Raju', photoUrl: 'https://image.tmdb.org/t/p/w200/x7IhU18FFYxFtfHEEiUZr7XJeYS.jpg' },
+      { name: 'Jr NTR', character: 'Komaram Bheem', photoUrl: 'https://image.tmdb.org/t/p/w200/npyNwFu3I3BRIjkQJpyJRZnU087.jpg' },
+      { name: 'Alia Bhatt', character: 'Sita', photoUrl: 'https://image.tmdb.org/t/p/w200/6IzFbZ4ZWRXLVlR5yI7v1IvPFz4.jpg' }
     ],
-    director: 'Christopher Nolan',
+    director: 'S.S. Rajamouli',
     format: ['2D', 'IMAX', '4DX']
   },
   {
     id: '2',
-    title: 'Dune: Part Two',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/8b8R8l88Qje9dn9OE8PY05Nxl1X.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/e9XRikkyth0GtG8RkU3XNm0oMsI.jpg',
-    releaseDate: '2024-03-01',
-    duration: '2h 46m',
-    genre: ['Sci-Fi', 'Adventure', 'Action'],
-    language: 'English',
-    rating: 8.7,
-    description: 'Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he must prevent a terrible future only he can foresee.',
-    trailerUrl: 'https://www.youtube.com/embed/Way9Dexny3w',
+    title: 'Baahubali: The Beginning',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/9BAjt8nC0zUz9DqO2aFgvXkQhzN.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/zLX1wMzP7XjLAwzUBeOuVGFhprg.jpg',
+    releaseDate: '2015-07-10',
+    duration: '2h 39m',
+    genre: ['Action', 'Adventure', 'Drama'],
+    language: 'Telugu',
+    rating: 8.1,
+    description: 'In ancient India, an adventurous and daring man becomes involved in a decades-old feud between two warring peoples.',
+    trailerUrl: 'https://www.youtube.com/embed/sOEg_YZQsTI',
     cast: [
-      { name: 'Timothée Chalamet', character: 'Paul Atreides', photoUrl: 'https://image.tmdb.org/t/p/w200/ddNKGrxDZYs0SURnOmAuXGIE6YI.jpg' },
-      { name: 'Zendaya', character: 'Chani', photoUrl: 'https://image.tmdb.org/t/p/w200/6TE2AlOUqcrs7CyJiWYgodmee1z.jpg' },
-      { name: 'Rebecca Ferguson', character: 'Lady Jessica', photoUrl: 'https://image.tmdb.org/t/p/w200/4E0esj18NQnZ0nIYJIFv8xCRoF3.jpg' }
+      { name: 'Prabhas', character: 'Shivudu/Baahubali', photoUrl: 'https://image.tmdb.org/t/p/w200/dDn4Qm9uFdMjbJAoOYJzCzzUdJc.jpg' },
+      { name: 'Rana Daggubati', character: 'Bhallaladeva', photoUrl: 'https://image.tmdb.org/t/p/w200/cCmPi0s5FVswQQwSWYQr9D1Xka4.jpg' },
+      { name: 'Anushka Shetty', character: 'Devasena', photoUrl: 'https://image.tmdb.org/t/p/w200/vu91MnuQoYpHF660tdEDN3taBR6.jpg' }
     ],
-    director: 'Denis Villeneuve',
-    format: ['2D', 'IMAX', '3D']
+    director: 'S.S. Rajamouli',
+    format: ['2D', 'IMAX']
   },
   {
     id: '3',
-    title: 'Oppenheimer',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/ptpr0kGAckfQkJeJIt8st5dglvd.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/rLb2cwF3Pazuxaj0sRXQ037tGI1.jpg',
-    releaseDate: '2023-07-21',
-    duration: '3h 0m',
-    genre: ['Drama', 'History', 'Thriller'],
-    language: 'English',
-    rating: 8.4,
-    description: 'The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.',
-    trailerUrl: 'https://www.youtube.com/embed/uYPbbksJxIg',
+    title: 'Pushpa: The Rise',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/m9CN7a1bk1TtmQRwAQxdwDG0jl.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/5hTK0J9SGPQvxqXWjcGalrjBJEj.jpg',
+    releaseDate: '2021-12-17',
+    duration: '2h 59m',
+    genre: ['Action', 'Crime', 'Thriller'],
+    language: 'Telugu',
+    rating: 7.6,
+    description: 'A laborer rises through the ranks of a red sandalwood smuggling syndicate, making enemies along the way.',
+    trailerUrl: 'https://www.youtube.com/embed/pKctjlxbFDQ',
     cast: [
-      { name: 'Cillian Murphy', character: 'J. Robert Oppenheimer', photoUrl: 'https://image.tmdb.org/t/p/w200/dm6V24NjjvjMiCtbMkc8Y2WPm2e.jpg' },
-      { name: 'Emily Blunt', character: 'Katherine Oppenheimer', photoUrl: 'https://image.tmdb.org/t/p/w200/xDc98BVQpfHBLRUNiLnUbm7JqOY.jpg' },
-      { name: 'Matt Damon', character: 'Leslie Groves', photoUrl: 'https://image.tmdb.org/t/p/w200/huVOlgcnUx5l6K5EvqrAWi10E5Z.jpg' }
+      { name: 'Allu Arjun', character: 'Pushpa Raj', photoUrl: 'https://image.tmdb.org/t/p/w200/ypq3WfKKSAJx5LpSPVKqAUKMfJT.jpg' },
+      { name: 'Rashmika Mandanna', character: 'Srivalli', photoUrl: 'https://image.tmdb.org/t/p/w200/jHWkYWv3LX4DB48pOfdcMiDnUZP.jpg' },
+      { name: 'Fahadh Faasil', character: 'Bhanwar Singh Shekhawat', photoUrl: 'https://image.tmdb.org/t/p/w200/stIgcCQzJeUAVZZj8MlT2Bb5j7h.jpg' }
     ],
-    director: 'Christopher Nolan',
+    director: 'Sukumar',
     format: ['2D', 'IMAX']
   },
   {
     id: '4',
-    title: 'Everything Everywhere All at Once',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/mDfJG3LC3Dqb67AZ52x3Z0jU0uB.jpg',
-    releaseDate: '2022-03-25',
-    duration: '2h 19m',
-    genre: ['Action', 'Adventure', 'Comedy'],
-    language: 'English',
-    rating: 8.2,
-    description: 'An aging Chinese immigrant is swept up in an insane adventure, where she alone can save the world by exploring other universes connecting with the lives she could have led.',
-    trailerUrl: 'https://www.youtube.com/embed/wxN1T1uxQ2g',
+    title: 'Sita Ramam',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/jvKLBfWKQpvISAfzX7JUFhvj2WN.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/etQEGAn9elqFG5sVVMc9QelJ7NW.jpg',
+    releaseDate: '2022-08-05',
+    duration: '2h 43m',
+    genre: ['Romance', 'Drama', 'Historical'],
+    language: 'Telugu',
+    rating: 8.5,
+    description: 'An orphaned soldier\'s life changes when he receives a letter from a girl named Sita. He meets her and love blossoms between them.',
+    trailerUrl: 'https://www.youtube.com/embed/QF-Y4Y-5b4w',
     cast: [
-      { name: 'Michelle Yeoh', character: 'Evelyn Wang', photoUrl: 'https://image.tmdb.org/t/p/w200/6oxvfyXnGOwx5hQ0r73P7i83Gps.jpg' },
-      { name: 'Ke Huy Quan', character: 'Waymond Wang', photoUrl: 'https://image.tmdb.org/t/p/w200/4YAhKj5pXxtxKDXoZTbJcAuKKgT.jpg' },
-      { name: 'Jamie Lee Curtis', character: 'Deirdre Beaubeirdre', photoUrl: 'https://image.tmdb.org/t/p/w200/8TcxRln8z6FbTS7JWxX6jH7QH5F.jpg' }
+      { name: 'Dulquer Salmaan', character: 'Ram', photoUrl: 'https://image.tmdb.org/t/p/w200/oqZ5L3RxJOJ3D2Ns074KGHh6Jkt.jpg' },
+      { name: 'Mrunal Thakur', character: 'Sita', photoUrl: 'https://image.tmdb.org/t/p/w200/qhJZzaMLpPlmkN8uLWhYknVOkqr.jpg' },
+      { name: 'Rashmika Mandanna', character: 'Afreen', photoUrl: 'https://image.tmdb.org/t/p/w200/jHWkYWv3LX4DB48pOfdcMiDnUZP.jpg' }
     ],
-    director: 'Daniel Kwan, Daniel Scheinert',
+    director: 'Hanu Raghavapudi',
     format: ['2D']
   },
   {
     id: '5',
-    title: 'The Batman',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/b0PlSFdDwbyK0cf5RxwDpaOJQvQ.jpg',
-    releaseDate: '2022-03-04',
-    duration: '2h 56m',
-    genre: ['Crime', 'Mystery', 'Action'],
-    language: 'English',
-    rating: 7.9,
-    description: 'When the Riddler, a sadistic serial killer, begins murdering key political figures in Gotham, Batman is forced to investigate the city\'s hidden corruption and question his family\'s involvement.',
-    trailerUrl: 'https://www.youtube.com/embed/mqqft2x_Aa4',
+    title: 'Kantara',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/ps3JdEYXpeSDJXL7S3mDe0Tgs4T.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/1rO1FxlZ47k9WL9CgJ1cWB88lTz.jpg',
+    releaseDate: '2022-09-30',
+    duration: '2h 30m',
+    genre: ['Action', 'Adventure', 'Thriller'],
+    language: 'Kannada',
+    rating: 8.0,
+    description: 'A conflict erupts between a village\'s guardians and evil forces. The deity\'s representative faces challenges that redefine his existence.',
+    trailerUrl: 'https://www.youtube.com/embed/ppYoIoW73PI',
     cast: [
-      { name: 'Robert Pattinson', character: 'Bruce Wayne', photoUrl: 'https://image.tmdb.org/t/p/w200/vVEwQlgaJYR3PvczKRyYzGZgJ7e.jpg' },
-      { name: 'Zoë Kravitz', character: 'Selina Kyle', photoUrl: 'https://image.tmdb.org/t/p/w200/4D0PpNI0kmP58hgrwGC3wCjxhnm.jpg' },
-      { name: 'Paul Dano', character: 'The Riddler', photoUrl: 'https://image.tmdb.org/t/p/w200/tB8CrXsvXGE6O7BfUAtVMdXbmqd.jpg' }
+      { name: 'Rishab Shetty', character: 'Shiva/Kaadubettu Shiva', photoUrl: 'https://image.tmdb.org/t/p/w200/aGNcWQbQT7lfXRXILz6oDTSoXUQ.jpg' },
+      { name: 'Sapthami Gowda', character: 'Leela', photoUrl: 'https://image.tmdb.org/t/p/w200/oNQYLmm8iZCjLlKPKaBMQHAR78U.jpg' },
+      { name: 'Kishore', character: 'Muralidhar', photoUrl: 'https://image.tmdb.org/t/p/w200/uKqVPvBX5ZUjnRfB6H6VcXvxQJS.jpg' }
     ],
-    director: 'Matt Reeves',
-    format: ['2D', 'IMAX']
+    director: 'Rishab Shetty',
+    format: ['2D']
   },
   {
     id: '6',
-    title: 'Barbie',
-    posterUrl: 'https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi8Qzsk3Yd4C.jpg',
-    backdropUrl: 'https://image.tmdb.org/t/p/original/ctMserH8g2SeOAnCw5gFjdQF8mo.jpg',
-    releaseDate: '2023-07-21',
-    duration: '1h 54m',
-    genre: ['Comedy', 'Adventure', 'Fantasy'],
-    language: 'English',
-    rating: 7.5,
-    description: 'Barbie and Ken are having the time of their lives in the colorful and seemingly perfect world of Barbie Land. However, when they get a chance to go to the real world, they soon discover the joys and perils of living among humans.',
-    trailerUrl: 'https://www.youtube.com/embed/pBk4NYhWNMM',
+    title: 'KGF: Chapter 2',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/qUUfTmpDxf3zG6Od7RZ4i7EIR09.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/tqcSehEef9wZZvk5K8BmSKKvY6u.jpg',
+    releaseDate: '2022-04-14',
+    duration: '2h 48m',
+    genre: ['Action', 'Drama', 'Thriller'],
+    language: 'Kannada',
+    rating: 8.3,
+    description: 'Rocky takes control of the Kolar Gold Fields and his newfound power makes him the target of people who want to bring him down at any cost.',
+    trailerUrl: 'https://www.youtube.com/embed/JKa05nyUmuQ',
     cast: [
-      { name: 'Margot Robbie', character: 'Barbie', photoUrl: 'https://image.tmdb.org/t/p/w200/euDPyqLnuwaWMHajcU3oZ9uZezR.jpg' },
-      { name: 'Ryan Gosling', character: 'Ken', photoUrl: 'https://image.tmdb.org/t/p/w200/lyUyVARQKhGxaTSTKR79l9XCWsb.jpg' },
-      { name: 'America Ferrera', character: 'Gloria', photoUrl: 'https://image.tmdb.org/t/p/w200/uzYsRhVkPXdl7mGKPkkPvDJrLOF.jpg' }
+      { name: 'Yash', character: 'Rocky', photoUrl: 'https://image.tmdb.org/t/p/w200/uBhCXvu0cLjnCacXbSJV6mrZCWH.jpg' },
+      { name: 'Srinidhi Shetty', character: 'Reena', photoUrl: 'https://image.tmdb.org/t/p/w200/xuaAXJbYEIJOsYJUwYUQoZG5mUt.jpg' },
+      { name: 'Sanjay Dutt', character: 'Adheera', photoUrl: 'https://image.tmdb.org/t/p/w200/e2pfhsraKvEPmQV1NlbNFp9LZcL.jpg' }
     ],
-    director: 'Greta Gerwig',
+    director: 'Prashanth Neel',
     format: ['2D', 'IMAX']
   },
+  {
+    id: '7',
+    title: 'Arjun Reddy',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/1VV9TcA9oQfkVTFAcOZivVWTFdJ.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/kHNvXUBN5oidxDgEZBEyVHHaCZD.jpg',
+    releaseDate: '2017-08-25',
+    duration: '2h 47m',
+    genre: ['Romance', 'Drama'],
+    language: 'Telugu',
+    rating: 7.9,
+    description: 'A short-tempered house surgeon gets used to drugs and drinks when his girlfriend is forced to marry another person.',
+    trailerUrl: 'https://www.youtube.com/embed/aozErj9NqeE',
+    cast: [
+      { name: 'Vijay Deverakonda', character: 'Arjun Reddy', photoUrl: 'https://image.tmdb.org/t/p/w200/5uKJJ5PimV5hDgKxnYc4QYX2eVL.jpg' },
+      { name: 'Shalini Pandey', character: 'Preethi', photoUrl: 'https://image.tmdb.org/t/p/w200/c6xT3XHmSnMjt4El5LoRCJq04Xc.jpg' },
+      { name: 'Rahul Ramakrishna', character: 'Shiva', photoUrl: 'https://image.tmdb.org/t/p/w200/dQCviTDm4XxXFfKc0BsEycGiQZe.jpg' }
+    ],
+    director: 'Sandeep Vanga',
+    format: ['2D']
+  },
+  {
+    id: '8',
+    title: 'Bahubali 2: The Conclusion',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/21sC2assImJ7CrT5MuTJNMfAIGD.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/5lAMQMWpXMsirvtLLvW7cJgEPkU.jpg',
+    releaseDate: '2017-04-28',
+    duration: '2h 47m',
+    genre: ['Action', 'Adventure', 'Drama'],
+    language: 'Telugu',
+    rating: 8.4,
+    description: 'After learning that his father was brutally killed by Bhallaladeva, Mahendra Baahubali raises an army to defeat him and release his mother from the former\'s captivity.',
+    trailerUrl: 'https://www.youtube.com/embed/G62HrubdD6o',
+    cast: [
+      { name: 'Prabhas', character: 'Amarendra Baahubali/Mahendra Baahubali', photoUrl: 'https://image.tmdb.org/t/p/w200/dDn4Qm9uFdMjbJAoOYJzCzzUdJc.jpg' },
+      { name: 'Rana Daggubati', character: 'Bhallaladeva', photoUrl: 'https://image.tmdb.org/t/p/w200/cCmPi0s5FVswQQwSWYQr9D1Xka4.jpg' },
+      { name: 'Anushka Shetty', character: 'Devasena', photoUrl: 'https://image.tmdb.org/t/p/w200/vu91MnuQoYpHF660tdEDN3taBR6.jpg' }
+    ],
+    director: 'S.S. Rajamouli',
+    format: ['2D', 'IMAX']
+  },
+  {
+    id: '9',
+    title: 'Jersey',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/yXrLCgtZUlMVoLmqLzTHzNX0H0f.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/7Tx15J6PRRoOsZ01lFX1sxJMJLJ.jpg',
+    releaseDate: '2019-04-19',
+    duration: '2h 40m',
+    genre: ['Drama', 'Sport'],
+    language: 'Telugu',
+    rating: 8.2,
+    description: 'A failed cricketer decides to revive his career in his late thirties to fulfill his son\'s wish for a jersey as a gift.',
+    trailerUrl: 'https://www.youtube.com/embed/AjAe_Q1WZ_8',
+    cast: [
+      { name: 'Nani', character: 'Arjun', photoUrl: 'https://image.tmdb.org/t/p/w200/aSbdKRB5nTyq8YUtyh6ZVkQICC6.jpg' },
+      { name: 'Shraddha Srinath', character: 'Sarah', photoUrl: 'https://image.tmdb.org/t/p/w200/6Y6ZHm9siwhWK4fVK11T2f2HKjG.jpg' },
+      { name: 'Ronit Kamra', character: 'Nani', photoUrl: 'https://image.tmdb.org/t/p/w200/xE1NXpuEbJyRRXH5qVBLLUyXOJr.jpg' }
+    ],
+    director: 'Gowtam Tinnanuri',
+    format: ['2D']
+  },
+  {
+    id: '10',
+    title: 'Rangasthalam',
+    posterUrl: 'https://image.tmdb.org/t/p/w500/2lhkKz31tQjw1TRccd5IgxrEWT4.jpg',
+    backdropUrl: 'https://image.tmdb.org/t/p/original/fpsdWgGydPJ1a1WhLl7YNKLfL2.jpg',
+    releaseDate: '2018-03-30',
+    duration: '2h 59m',
+    genre: ['Action', 'Drama', 'Thriller'],
+    language: 'Telugu',
+    rating: 8.3,
+    description: 'Chitti Babu, a partially deaf man, lives in a village called Rangasthalam and falls in love with Lakshmi. When his brother decides to contest in local body elections against the local strongman, events take a violent turn.',
+    trailerUrl: 'https://www.youtube.com/embed/cE0eTF32k1c',
+    cast: [
+      { name: 'Ram Charan', character: 'Chitti Babu', photoUrl: 'https://image.tmdb.org/t/p/w200/x7IhU18FFYxFtfHEEiUZr7XJeYS.jpg' },
+      { name: 'Samantha Ruth Prabhu', character: 'Ramalakshmi', photoUrl: 'https://image.tmdb.org/t/p/w200/ej1fYd2CePYnAEbLGRFnmCGIH3Y.jpg' },
+      { name: 'Aadhi Pinisetty', character: 'Kumar Babu', photoUrl: 'https://image.tmdb.org/t/p/w200/tOmDvUdSzxYVdNk1g4Zde7e6WLQ.jpg' }
+    ],
+    director: 'Sukumar',
+    format: ['2D']
+  }
 ];
 
 export const theaters: Theater[] = [
@@ -238,7 +318,8 @@ export const showtimes: Showtime[] = [
       standard: 12,
       premium: 18,
       vip: 24
-    }
+    },
+    available: true
   },
   {
     id: '2',
@@ -251,7 +332,8 @@ export const showtimes: Showtime[] = [
       standard: 16,
       premium: 22,
       vip: 28
-    }
+    },
+    available: true
   },
   {
     id: '3',
@@ -264,7 +346,8 @@ export const showtimes: Showtime[] = [
       standard: 14,
       premium: 20,
       vip: 26
-    }
+    },
+    available: false
   },
   {
     id: '4',
@@ -277,7 +360,8 @@ export const showtimes: Showtime[] = [
       standard: 14,
       premium: 20,
       vip: 26
-    }
+    },
+    available: true
   },
   {
     id: '5',
@@ -290,7 +374,8 @@ export const showtimes: Showtime[] = [
       standard: 18,
       premium: 24,
       vip: 30
-    }
+    },
+    available: true
   },
   {
     id: '6',
@@ -303,7 +388,8 @@ export const showtimes: Showtime[] = [
       standard: 13,
       premium: 19,
       vip: 25
-    }
+    },
+    available: true
   }
 ];
 
