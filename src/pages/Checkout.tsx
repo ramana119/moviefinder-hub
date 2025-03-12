@@ -32,7 +32,7 @@ const Checkout = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, isAuthenticated } = useUser();
+  const { user, isAuthenticated, redirectToLogin } = useUser();
   
   const [movie, setMovie] = useState(movies[0]);
   const [showtime, setShowtime] = useState(showtimes[0]);
@@ -50,6 +50,12 @@ const Checkout = () => {
   const seatPrice = 150; // In a real app, this would be calculated from the selected seats
   
   useEffect(() => {
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      redirectToLogin();
+      return;
+    }
+    
     setLoading(true);
     
     // Find movie, showtime, and theater
@@ -73,7 +79,7 @@ const Checkout = () => {
     }, 800);
     
     return () => clearTimeout(timer);
-  }, [movieId, showtimeId, user]);
+  }, [movieId, showtimeId, user, isAuthenticated, redirectToLogin]);
   
   const calculateTotal = () => {
     const baseTotal = selectedSeatIds.length * seatPrice;
@@ -115,7 +121,7 @@ const Checkout = () => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );

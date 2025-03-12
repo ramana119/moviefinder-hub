@@ -1,8 +1,9 @@
 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, Star } from "lucide-react";
+import { Calendar, Clock, Star, Globe } from "lucide-react";
 import { Movie } from "@/data/mockData";
+import { Badge } from "./badge";
 
 interface MovieCardProps {
   movie: Movie;
@@ -12,7 +13,7 @@ interface MovieCardProps {
 const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
   return (
     <motion.div
-      whileHover={{ y: -10 }}
+      whileHover={{ y: -5 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -26,13 +27,20 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
             src={movie.posterUrl}
             alt={movie.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
             <div className="text-white">
               <p className="font-medium leading-tight mb-1">{movie.title}</p>
               <div className="flex items-center gap-2 text-xs">
-                <Clock className="w-3 h-3" />
-                <span>{movie.duration}</span>
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1" />
+                  <span>{movie.duration}</span>
+                </div>
+                <div className="flex items-center">
+                  <Globe className="w-3 h-3 mr-1" />
+                  <span>{movie.language}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -51,9 +59,14 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
           </h3>
         </Link>
 
-        <div className="flex items-center text-gray-500 text-sm mb-2">
-          <Calendar className="w-4 h-4 mr-1" />
-          <span>{movie.releaseDate}</span>
+        <div className="flex flex-wrap items-center justify-between text-gray-500 text-sm mb-2">
+          <div className="flex items-center">
+            <Calendar className="w-4 h-4 mr-1" />
+            <span>{movie.releaseDate}</span>
+          </div>
+          <Badge variant="outline" className="text-xs bg-gray-50 border-gray-200">
+            {movie.language}
+          </Badge>
         </div>
 
         <div className="flex flex-wrap gap-1">

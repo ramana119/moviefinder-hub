@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Showtime } from "@/data/mockData";
 import { Badge } from "./badge";
 import { CalendarCheck, Clock, MapPin } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
 interface ShowtimeSelectorProps {
   showtimes: Showtime[];
@@ -14,12 +15,20 @@ interface ShowtimeSelectorProps {
 
 const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) => {
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
+  const { isAuthenticated, redirectToLogin } = useUser();
   
   const formats = Array.from(new Set(showtimes.map(s => s.format)));
   
   const filteredShowtimes = selectedFormat 
     ? showtimes.filter(s => s.format === selectedFormat)
     : showtimes;
+
+  const handleShowtimeClick = (e: React.MouseEvent, showtimeId: string) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      redirectToLogin();
+    }
+  };
 
   return (
     <div>
@@ -29,9 +38,9 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
           {formats.map(format => (
             <button
               key={format}
-              className={`px-2 py-1 text-xs rounded-full transition ${
+              className={`px-3 py-1 text-xs rounded-full transition ${
                 selectedFormat === format
-                  ? "bg-primary text-white"
+                  ? "bg-primary text-primary-foreground"
                   : "bg-gray-100 hover:bg-gray-200 text-gray-800"
               }`}
               onClick={() => setSelectedFormat(format === selectedFormat ? null : format)}
@@ -52,10 +61,11 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
           >
             <Link
               to={`/booking/${movieId}/${showtime.id}?date=${date}`}
+              onClick={(e) => handleShowtimeClick(e, showtime.id)}
               className={`
                 inline-block px-3 py-2 text-xs font-medium rounded border 
                 hover:border-primary hover:text-primary transition-colors
-                border-green-500 text-green-700
+                ${showtime.available ? 'border-green-500 text-green-700' : 'border-gray-300 text-gray-400 cursor-not-allowed'}
               `}
             >
               {showtime.time}

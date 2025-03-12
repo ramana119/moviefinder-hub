@@ -6,23 +6,28 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { MapPin, Search } from "lucide-react";
 
-// Sample cities data
+// Indian cities data
 const cities = [
-  "New York",
-  "Los Angeles",
-  "Chicago",
-  "Houston",
-  "Phoenix",
-  "Philadelphia",
-  "San Antonio",
-  "San Diego",
-  "Dallas",
-  "San Jose",
   "Mumbai",
   "Delhi",
   "Bangalore",
+  "Hyderabad",
   "Chennai",
-  "Kolkata"
+  "Kolkata",
+  "Pune",
+  "Ahmedabad",
+  "Jaipur",
+  "Lucknow",
+  "Kochi",
+  "Chandigarh",
+  "Indore",
+  "Bhopal",
+  "Goa",
+  "Coimbatore",
+  "Nagpur",
+  "Visakhapatnam",
+  "Surat",
+  "Thiruvananthapuram"
 ];
 
 interface LocationSelectorProps {
@@ -63,7 +68,7 @@ const LocationSelector = ({ selectedLocation, onLocationChange }: LocationSelect
       
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Select your location</DialogTitle>
+          <DialogTitle>Select your city</DialogTitle>
         </DialogHeader>
         
         <div className="relative my-4">
