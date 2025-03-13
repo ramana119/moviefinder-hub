@@ -10,6 +10,8 @@ import { movies } from "@/data/mockData";
 
 const Index = () => {
   const [featuredMovies, setFeaturedMovies] = useState(movies.slice(0, 3));
+  const [nowShowingMovies, setNowShowingMovies] = useState(movies.slice(0, 5));
+  const [comingSoonMovies, setComingSoonMovies] = useState(movies.slice(6, 10));
   const [displayedMovies, setDisplayedMovies] = useState(movies);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -128,7 +130,7 @@ const Index = () => {
                 </motion.div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {displayedMovies.slice(0, 5).map((movie) => (
+                  {nowShowingMovies.map((movie) => (
                     <motion.div key={movie.id} variants={childVariants}>
                       <MovieCard movie={movie} />
                     </motion.div>
@@ -154,7 +156,7 @@ const Index = () => {
                 </motion.div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {displayedMovies.slice(2, 6).map((movie) => (
+                  {comingSoonMovies.map((movie) => (
                     <motion.div key={movie.id} variants={childVariants}>
                       <MovieCard movie={movie} />
                     </motion.div>
@@ -172,7 +174,7 @@ const Index = () => {
                 </motion.h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {displayedMovies.slice(0, 2).map((movie) => (
+                  {featuredMovies.slice(0, 2).map((movie) => (
                     <motion.div key={movie.id} variants={childVariants}>
                       <MovieCard movie={movie} featured />
                     </motion.div>

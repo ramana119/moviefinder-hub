@@ -28,8 +28,8 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
 
   if (!currentMovie) {
     return (
-      <div className="relative w-full h-[70vh] bg-indigo-900 flex items-center justify-center">
-        <p className="text-white text-xl">Loading featured movies...</p>
+      <div className="relative w-full h-[70vh] bg-indigo-100 flex items-center justify-center">
+        <p className="text-indigo-800 text-xl">Loading featured movies...</p>
       </div>
     );
   }
@@ -45,9 +45,9 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
           transition={{ duration: 1 }}
           className="absolute inset-0"
         >
-          {/* Background Image with overlay */}
+          {/* Background Image with simplified overlay */}
           <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-indigo-900/50 to-black/80 z-10"></div>
+            <div className="absolute inset-0 bg-black/30 z-10"></div>
             <div
               className="absolute inset-0 z-0 bg-cover bg-center"
               style={{
@@ -55,20 +55,20 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
                 backgroundPosition: "center 25%",
               }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent z-20"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90 z-20"></div>
           </div>
 
           <div className="relative z-30 container mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
             <div className="max-w-3xl mt-20">
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-xs sm:text-sm px-3 py-1.5 bg-indigo-500/80 text-white font-medium rounded-full backdrop-blur-sm">
+                <span className="text-xs sm:text-sm px-3 py-1.5 bg-indigo-500/80 text-white font-medium rounded-full">
                   Now Showing
                 </span>
-                <div className="flex items-center gap-2 text-white/80 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 text-white text-xs sm:text-sm">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{currentMovie.releaseDate}</span>
                 </div>
-                <div className="flex items-center gap-2 text-white/80 text-xs sm:text-sm">
+                <div className="flex items-center gap-2 text-white text-xs sm:text-sm">
                   <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span>{currentMovie.duration}</span>
                 </div>
@@ -92,7 +92,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
                 {currentMovie.genre.map((genre, index) => (
                   <span
                     key={index}
-                    className="text-xs sm:text-sm px-3 py-1 bg-indigo-600/70 text-white rounded-full backdrop-blur-sm"
+                    className="text-xs sm:text-sm px-3 py-1 bg-white/20 text-white rounded-full"
                   >
                     {genre}
                   </span>
@@ -115,7 +115,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                className="text-white/80 text-sm sm:text-base mb-8 max-w-xl line-clamp-3"
+                className="text-white/90 text-sm sm:text-base mb-8 max-w-xl line-clamp-3"
               >
                 {currentMovie.description}
               </motion.p>
@@ -156,14 +156,14 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Indicators */}
+      {/* Simplified indicators */}
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 flex items-center gap-2">
         {movies.map((_, index) => (
           <button
             key={index}
             onClick={() => handleIndicatorClick(index)}
             className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? "w-8 bg-indigo-600" : "w-2 bg-white/50"
+              index === currentIndex ? "w-8 bg-white" : "w-2 bg-white/50"
             }`}
             aria-label={`View slide ${index + 1}`}
           />
