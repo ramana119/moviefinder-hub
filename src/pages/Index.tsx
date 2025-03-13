@@ -27,11 +27,29 @@ const Index = () => {
     return releaseDate > currentDate;
   });
 
-  const [featuredMovies, setFeaturedMovies] = useState(nowShowingMoviesAll.slice(0, 3));
-  const [nowShowingMovies, setNowShowingMovies] = useState(nowShowingMoviesAll.slice(0, 5));
-  const [comingSoonMovies, setComingSoonMovies] = useState(comingSoonMoviesAll.slice(0, 5));
+  // Make sure we have movies to display, fallback to all movies if filters return empty arrays
+  const [featuredMovies, setFeaturedMovies] = useState(
+    nowShowingMoviesAll.length >= 3 ? nowShowingMoviesAll.slice(0, 3) : movies.slice(0, 3)
+  );
+  
+  const [nowShowingMovies, setNowShowingMovies] = useState(
+    nowShowingMoviesAll.length > 0 ? nowShowingMoviesAll.slice(0, 5) : movies.slice(0, 5)
+  );
+  
+  const [comingSoonMovies, setComingSoonMovies] = useState(
+    comingSoonMoviesAll.length > 0 ? comingSoonMoviesAll.slice(0, 5) : movies.slice(5, 10)
+  );
+  
   const [displayedMovies, setDisplayedMovies] = useState(movies);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Log for debugging
+  useEffect(() => {
+    console.log("All movies count:", movies.length);
+    console.log("Now showing movies count:", nowShowingMoviesAll.length);
+    console.log("Coming soon movies count:", comingSoonMoviesAll.length);
+    console.log("Featured movies:", featuredMovies);
+  }, []);
 
   // Simulating loading state
   useEffect(() => {
@@ -111,13 +129,35 @@ const Index = () => {
     );
   }
 
+  // If we still don't have movies to display, show a message
+  if (movies.length === 0) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-foreground mb-4">No Movies Available</h2>
+            <p className="text-muted-foreground">Please check back later for movie listings.</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       <main className="flex-1">
         {/* Hero Banner with Featured Movies */}
-        <FeaturedMovie movies={featuredMovies} />
+        {featuredMovies.length > 0 ? (
+          <FeaturedMovie movies={featuredMovies} />
+        ) : (
+          <div className="w-full h-[70vh] flex items-center justify-center bg-gray-900">
+            <p className="text-primary text-xl">No featured movies available</p>
+          </div>
+        )}
 
         {/* Main Content */}
         <section className="py-16">
@@ -147,13 +187,17 @@ const Index = () => {
                   </a>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {nowShowingMovies.map((movie) => (
-                    <motion.div key={movie.id} variants={childVariants}>
-                      <MovieCard movie={movie} />
-                    </motion.div>
-                  ))}
-                </div>
+                {nowShowingMovies.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {nowShowingMovies.map((movie) => (
+                      <motion.div key={movie.id} variants={childVariants}>
+                        <MovieCard movie={movie} />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No movies currently showing</p>
+                )}
               </div>
 
               {/* Coming Soon Movies */}
@@ -173,13 +217,17 @@ const Index = () => {
                   </a>
                 </motion.div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {comingSoonMovies.map((movie) => (
-                    <motion.div key={movie.id} variants={childVariants}>
-                      <MovieCard movie={movie} />
-                    </motion.div>
-                  ))}
-                </div>
+                {comingSoonMovies.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                    {comingSoonMovies.map((movie) => (
+                      <motion.div key={movie.id} variants={childVariants}>
+                        <MovieCard movie={movie} />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No upcoming movies scheduled</p>
+                )}
               </div>
 
               {/* Featured Movie Section */}
@@ -191,13 +239,17 @@ const Index = () => {
                   Featured Movies
                 </motion.h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {featuredMovies.slice(0, 2).map((movie) => (
-                    <motion.div key={movie.id} variants={childVariants}>
-                      <MovieCard movie={movie} featured />
-                    </motion.div>
-                  ))}
-                </div>
+                {featuredMovies.length >= 2 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {featuredMovies.slice(0, 2).map((movie) => (
+                      <motion.div key={movie.id} variants={childVariants}>
+                        <MovieCard movie={movie} featured />
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">No featured movies available</p>
+                )}
               </div>
             </motion.div>
           </div>

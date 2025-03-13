@@ -14,7 +14,7 @@ function App() {
   return (
     <BrowserRouter>
       <UserProvider>
-        <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 min-h-screen">
+        <div className="bg-[#121212] text-white min-h-screen">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/movie/:id" element={<MovieDetails />} />

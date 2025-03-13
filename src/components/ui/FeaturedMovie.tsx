@@ -12,15 +12,18 @@ interface FeaturedMovieProps {
 
 const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const currentMovie = movies[currentIndex];
+  const currentMovie = movies && movies.length > 0 ? movies[currentIndex] : null;
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % movies.length);
-    }, 6000);
+    // Only set the interval if we have movies to display
+    if (movies && movies.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % movies.length);
+      }, 6000);
 
-    return () => clearInterval(interval);
-  }, [movies.length]);
+      return () => clearInterval(interval);
+    }
+  }, [movies]);
 
   const handleIndicatorClick = (index: number) => {
     setCurrentIndex(index);
@@ -156,18 +159,20 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
       </AnimatePresence>
 
       {/* Simplified indicators */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 flex items-center gap-2">
-        {movies.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => handleIndicatorClick(index)}
-            className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? "w-8 bg-primary" : "w-2 bg-white/50"
-            }`}
-            aria-label={`View slide ${index + 1}`}
-          />
-        ))}
-      </div>
+      {movies && movies.length > 1 && (
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-40 flex items-center gap-2">
+          {movies.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handleIndicatorClick(index)}
+              className={`h-1.5 rounded-full transition-all ${
+                index === currentIndex ? "w-8 bg-primary" : "w-2 bg-white/50"
+              }`}
+              aria-label={`View slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
