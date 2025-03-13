@@ -97,6 +97,22 @@
   .dark-card {
     @apply bg-gradient-to-b from-gray-900 to-gray-800 border border-gray-700;
   }
+  
+  .bookmyshow-gradient {
+    @apply bg-gradient-to-r from-red-600 to-purple-600;
+  }
+  
+  .movie-card {
+    @apply bg-gradient-to-b from-gray-800 to-gray-900 border border-gray-700 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300;
+  }
+  
+  .featured-badge {
+    @apply bg-gradient-to-r from-yellow-500 to-amber-500 text-black font-bold;
+  }
+  
+  .language-badge {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-500 text-white;
+  }
 }
 
 @layer utilities {

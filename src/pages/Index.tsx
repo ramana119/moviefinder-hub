@@ -27,21 +27,40 @@ const Index = () => {
     return releaseDate > currentDate;
   });
 
+  // For testing, if the arrays are empty, create temporary collections
+  const tempNowShowing = nowShowingMoviesAll.length > 0 ? 
+    nowShowingMoviesAll : 
+    movies.filter((_, index) => index < 5);
+    
+  const tempComingSoon = comingSoonMoviesAll.length > 0 ? 
+    comingSoonMoviesAll : 
+    movies.filter((_, index) => index >= 5);
+
   // Make sure we have movies to display, fallback to all movies if filters return empty arrays
   const [featuredMovies, setFeaturedMovies] = useState(
-    nowShowingMoviesAll.length >= 3 ? nowShowingMoviesAll.slice(0, 3) : movies.slice(0, 3)
+    tempNowShowing.slice(0, 3)
   );
   
   const [nowShowingMovies, setNowShowingMovies] = useState(
-    nowShowingMoviesAll.length > 0 ? nowShowingMoviesAll.slice(0, 5) : movies.slice(0, 5)
+    tempNowShowing
   );
   
   const [comingSoonMovies, setComingSoonMovies] = useState(
-    comingSoonMoviesAll.length > 0 ? comingSoonMoviesAll.slice(0, 5) : movies.slice(5, 10)
+    tempComingSoon
   );
   
   const [displayedMovies, setDisplayedMovies] = useState(movies);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<{
+    genres: string[];
+    languages: string[];
+    formats: string[];
+  }>({
+    genres: [],
+    languages: [],
+    formats: [],
+  });
 
   // Log for debugging
   useEffect(() => {
@@ -61,15 +80,8 @@ const Index = () => {
   }, []);
 
   const handleSearch = (query: string) => {
-    if (!query.trim()) {
-      setDisplayedMovies(movies);
-      return;
-    }
-
-    const filtered = movies.filter((movie) =>
-      movie.title.toLowerCase().includes(query.toLowerCase())
-    );
-    setDisplayedMovies(filtered);
+    setSearchQuery(query);
+    applyFiltersAndSearch(query, activeFilters);
   };
 
   const handleFilter = (filters: {
@@ -77,8 +89,21 @@ const Index = () => {
     languages: string[];
     formats: string[];
   }) => {
-    let filtered = [...movies];
+    setActiveFilters(filters);
+    applyFiltersAndSearch(searchQuery, filters);
+  };
 
+  const applyFiltersAndSearch = (query: string, filters: typeof activeFilters) => {
+    let filtered = [...movies];
+    
+    // Apply search query
+    if (query.trim()) {
+      filtered = filtered.filter((movie) =>
+        movie.title.toLowerCase().includes(query.toLowerCase())
+      );
+    }
+
+    // Apply filters
     if (filters.genres.length > 0) {
       filtered = filtered.filter((movie) =>
         movie.genre.some((g) => filters.genres.includes(g))
@@ -98,6 +123,24 @@ const Index = () => {
     }
 
     setDisplayedMovies(filtered);
+    
+    // Update Now Showing and Coming Soon collections based on release date
+    const currentDate = new Date();
+    
+    const nowShowing = filtered.filter(movie => {
+      const releaseDate = new Date(movie.releaseDate);
+      const twoMonthsAgo = new Date();
+      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+      return releaseDate <= currentDate && releaseDate >= twoMonthsAgo;
+    });
+    
+    const comingSoon = filtered.filter(movie => {
+      const releaseDate = new Date(movie.releaseDate);
+      return releaseDate > currentDate;
+    });
+    
+    setNowShowingMovies(nowShowing.length > 0 ? nowShowing : tempNowShowing);
+    setComingSoonMovies(comingSoon.length > 0 ? comingSoon : tempComingSoon);
   };
 
   const containerVariants = {

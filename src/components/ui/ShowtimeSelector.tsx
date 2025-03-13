@@ -64,9 +64,7 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
               className={`
                 inline-block px-4 py-2 text-xs font-medium rounded border 
                 hover:border-primary transition-colors
-                ${showtime.available 
-                  ? "bg-gray-800 border-gray-700 text-foreground hover:bg-gray-700" 
-                  : "bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed opacity-50"}
+                bg-gray-800 border-gray-700 text-foreground hover:bg-gray-700
               `}
             >
               {showtime.time}

@@ -15,7 +15,9 @@ const indianCities = [
   "Madurai", "Coimbatore", "Varanasi", "Surat", "Kochi",
   "Vijayawada", "Thiruvananthapuram", "Indore", "Mysore", "Guwahati",
   "Tiruchirappalli", "Amritsar", "Mangalore", "Hubli", "Jammu",
-  "Dehradun", "Chandigarh", "Pondicherry", "Ranchi", "Raipur"
+  "Dehradun", "Chandigarh", "Pondicherry", "Ranchi", "Raipur",
+  "Kakinada", "Warangal", "Nizamabad", "Tirupati", "Guntur", 
+  "Nellore", "Rajahmundry", "Karimnagar", "Eluru", "Anantapur"
 ];
 
 interface LocationSelectorProps {
@@ -54,16 +56,16 @@ const LocationSelector = ({ selectedLocation, onLocationChange }: LocationSelect
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+      <DialogContent className="sm:max-w-md bg-gray-900 border-2 border-gray-800">
         <DialogHeader>
-          <DialogTitle className="text-xl text-indigo-700">Select your city</DialogTitle>
+          <DialogTitle className="text-xl text-white">Select your city</DialogTitle>
         </DialogHeader>
         
         <div className="relative my-4">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input
             placeholder="Search for a city..."
-            className="pl-10 border-indigo-200 focus:border-indigo-400"
+            className="pl-10 border-gray-700 bg-gray-800 focus:border-primary"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -78,7 +80,7 @@ const LocationSelector = ({ selectedLocation, onLocationChange }: LocationSelect
               className={`p-3 rounded-lg text-left transition-colors ${
                 city === selectedLocation
                   ? "bg-primary text-white"
-                  : "bg-indigo-50 hover:bg-indigo-100 text-indigo-800"
+                  : "bg-gray-800 hover:bg-gray-700 text-white border border-gray-700"
               }`}
               onClick={() => handleSelectCity(city)}
             >

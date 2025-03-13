@@ -50,7 +50,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
         >
           {/* Background Image with simplified overlay */}
           <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-black/50 z-10"></div>
+            <div className="absolute inset-0 bg-black/60 z-10"></div>
             <div
               className="absolute inset-0 z-0 bg-cover bg-center"
               style={{
