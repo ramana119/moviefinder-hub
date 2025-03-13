@@ -15,7 +15,7 @@ interface ShowtimeSelectorProps {
 
 const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) => {
   const [selectedFormat, setSelectedFormat] = useState<string | null>(null);
-  const { isAuthenticated, redirectToLogin } = useUser();
+  const { isAuthenticated, redirectToLogin, requireAuth } = useUser();
   
   const formats = Array.from(new Set(showtimes.map(s => s.format)));
   
@@ -24,14 +24,13 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
     : showtimes;
 
   const handleShowtimeClick = (e: React.MouseEvent, showtimeId: string) => {
-    if (!isAuthenticated) {
+    if (!requireAuth()) {
       e.preventDefault();
-      redirectToLogin();
     }
   };
 
   return (
-    <div className="p-4 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-lg shadow-md">
+    <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg shadow-md">
       {/* Format filter */}
       {formats.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-3">
@@ -40,8 +39,8 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
               key={format}
               className={`px-3 py-1 text-xs rounded-full transition ${
                 selectedFormat === format
-                  ? "bg-purple-600 text-white"
-                  : "bg-white hover:bg-purple-100 text-purple-800 border border-purple-200"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-gray-800 hover:bg-gray-700 text-foreground border border-gray-700"
               }`}
               onClick={() => setSelectedFormat(format === selectedFormat ? null : format)}
             >
@@ -64,8 +63,10 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
               onClick={(e) => handleShowtimeClick(e, showtime.id)}
               className={`
                 inline-block px-4 py-2 text-xs font-medium rounded border 
-                hover:border-purple-500 transition-colors
-                bg-white border-purple-300 text-purple-700 hover:bg-purple-50
+                hover:border-primary transition-colors
+                ${showtime.available 
+                  ? "bg-gray-800 border-gray-700 text-foreground hover:bg-gray-700" 
+                  : "bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed opacity-50"}
               `}
             >
               {showtime.time}
@@ -74,7 +75,7 @@ const ShowtimeSelector = ({ showtimes, movieId, date }: ShowtimeSelectorProps) =
         ))}
         
         {filteredShowtimes.length === 0 && (
-          <p className="text-sm text-purple-500 py-2">No showtimes available for this selection.</p>
+          <p className="text-sm text-muted-foreground py-2">No showtimes available for this selection.</p>
         )}
       </div>
     </div>

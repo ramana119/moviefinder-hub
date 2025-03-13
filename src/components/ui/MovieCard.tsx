@@ -17,7 +17,7 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`group bg-gradient-to-b from-white to-indigo-50 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-indigo-100 ${
+      className={`group dark-card rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 ${
         featured ? "md:col-span-2" : ""
       }`}
     >
@@ -29,7 +29,7 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/90 via-indigo-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
             <div className="text-white">
               <p className="font-medium leading-tight mb-1">{movie.title}</p>
               <div className="flex items-center gap-2 text-xs">
@@ -46,7 +46,7 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
           </div>
         </div>
 
-        <div className="absolute top-2 right-2 flex items-center gap-1 bg-indigo-900/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-full">
+        <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/80 backdrop-blur-sm text-white text-xs font-bold px-2 py-1 rounded-full">
           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
           <span>{movie.rating.toFixed(1)}</span>
         </div>
@@ -54,17 +54,17 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
 
       <div className="p-4">
         <Link to={`/movie/${movie.id}`} className="block">
-          <h3 className="font-semibold text-indigo-900 line-clamp-1 mb-1 group-hover:text-indigo-600 transition-colors">
+          <h3 className="font-semibold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
             {movie.title}
           </h3>
         </Link>
 
-        <div className="flex flex-wrap items-center justify-between text-gray-500 text-sm mb-2">
+        <div className="flex flex-wrap items-center justify-between text-muted-foreground text-sm mb-2">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 mr-1" />
             <span>{movie.releaseDate}</span>
           </div>
-          <Badge variant="outline" className="text-xs bg-indigo-50 border-indigo-200 text-indigo-700">
+          <Badge variant="outline" className="text-xs bg-accent text-accent-foreground">
             {movie.language}
           </Badge>
         </div>
@@ -73,13 +73,13 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
           {movie.genre.slice(0, 2).map((genre, index) => (
             <span
               key={index}
-              className="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full"
+              className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full"
             >
               {genre}
             </span>
           ))}
           {movie.genre.length > 2 && (
-            <span className="text-xs px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full">
+            <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded-full">
               +{movie.genre.length - 2}
             </span>
           )}
@@ -87,11 +87,11 @@ const MovieCard = ({ movie, featured = false }: MovieCardProps) => {
 
         {featured && (
           <div className="mt-3">
-            <p className="text-gray-600 text-sm line-clamp-2">{movie.description}</p>
+            <p className="text-muted-foreground text-sm line-clamp-2">{movie.description}</p>
             <div className="mt-4">
               <Link
                 to={`/movie/${movie.id}`}
-                className="inline-flex items-center text-indigo-600 font-medium text-sm hover:underline"
+                className="inline-flex items-center text-primary font-medium text-sm hover:underline"
               >
                 Book tickets
               </Link>

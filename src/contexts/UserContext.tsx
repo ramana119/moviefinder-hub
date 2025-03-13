@@ -14,6 +14,7 @@ interface UserContextType {
   requireAuth: () => boolean;
   updateProfile: (userData: Partial<UserData>) => void;
   verifyEmail: () => void;
+  isProfileComplete: () => boolean;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -56,6 +57,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       description: "Your account has been created successfully. Please verify your email.",
       variant: "default",
     });
+    
+    // Add the user to the "database" (localStorage in this case)
+    const usersJSON = localStorage.getItem("users");
+    const users = usersJSON ? JSON.parse(usersJSON) : [];
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
   };
 
   const logout = () => {
@@ -88,6 +95,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     return false;
   };
 
+  const isProfileComplete = () => {
+    if (!user) return false;
+    return !!(user.name && user.email && user.phone);
+  };
+
   const requireAuth = () => {
     if (!isAuthenticated) {
       redirectToLogin();
@@ -95,10 +107,24 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
     
     // Check if profile is complete with name, email, and phone
-    if (user && (!user.name || !user.email || !user.phone)) {
+    if (!isProfileComplete()) {
       toast({
         title: "Complete Your Profile",
         description: "Please complete your profile before proceeding.",
+        variant: "destructive",
+      });
+      
+      // Trigger the profile dialog
+      const event = new CustomEvent('openAuthDialog');
+      window.dispatchEvent(event);
+      return false;
+    }
+    
+    // If email verification is required for payment, check here
+    if (window.location.pathname.includes('/checkout') && user && !user.verified) {
+      toast({
+        title: "Email Verification Required",
+        description: "Please verify your email before proceeding to payment.",
         variant: "destructive",
       });
       
@@ -117,6 +143,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser(updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
       
+      // Also update in the "database"
+      const usersJSON = localStorage.getItem("users");
+      if (usersJSON) {
+        const users = JSON.parse(usersJSON);
+        const updatedUsers = users.map((u: UserData) => 
+          u.email === user.email ? { ...u, ...userData } : u
+        );
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+      }
+      
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully",
@@ -129,6 +165,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       const verifiedUser = { ...user, verified: true };
       setUser(verifiedUser);
       localStorage.setItem("user", JSON.stringify(verifiedUser));
+      
+      // Also update in the "database"
+      const usersJSON = localStorage.getItem("users");
+      if (usersJSON) {
+        const users = JSON.parse(usersJSON);
+        const updatedUsers = users.map((u: UserData) => 
+          u.email === user.email ? { ...u, verified: true } : u
+        );
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+      }
       
       toast({
         title: "Email Verified",
@@ -148,7 +194,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       redirectToLogin,
       requireAuth,
       updateProfile,
-      verifyEmail
+      verifyEmail,
+      isProfileComplete
     }}>
       {children}
     </UserContext.Provider>

@@ -9,9 +9,27 @@ import SearchFilter from "@/components/ui/SearchFilter";
 import { movies } from "@/data/mockData";
 
 const Index = () => {
-  const [featuredMovies, setFeaturedMovies] = useState(movies.slice(0, 3));
-  const [nowShowingMovies, setNowShowingMovies] = useState(movies.slice(0, 5));
-  const [comingSoonMovies, setComingSoonMovies] = useState(movies.slice(6, 10));
+  // Current date to determine which movies are now showing vs coming soon
+  const currentDate = new Date();
+  
+  // Filter movies based on release date
+  const nowShowingMoviesAll = movies.filter(movie => {
+    const releaseDate = new Date(movie.releaseDate);
+    // Movies released up to 2 months ago are considered "now showing"
+    const twoMonthsAgo = new Date();
+    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+    return releaseDate <= currentDate && releaseDate >= twoMonthsAgo;
+  });
+  
+  const comingSoonMoviesAll = movies.filter(movie => {
+    const releaseDate = new Date(movie.releaseDate);
+    // Movies to be released in the future are "coming soon"
+    return releaseDate > currentDate;
+  });
+
+  const [featuredMovies, setFeaturedMovies] = useState(nowShowingMoviesAll.slice(0, 3));
+  const [nowShowingMovies, setNowShowingMovies] = useState(nowShowingMoviesAll.slice(0, 5));
+  const [comingSoonMovies, setComingSoonMovies] = useState(comingSoonMoviesAll.slice(0, 5));
   const [displayedMovies, setDisplayedMovies] = useState(movies);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -19,7 +37,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 800);
 
     return () => clearTimeout(timer);
   }, []);
@@ -87,14 +105,14 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <span className="loader"></span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       
       <main className="flex-1">
@@ -118,7 +136,7 @@ const Index = () => {
                   variants={childVariants}
                   className="flex justify-between items-center mb-6"
                 >
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                     Now Showing
                   </h2>
                   <a
@@ -144,7 +162,7 @@ const Index = () => {
                   variants={childVariants}
                   className="flex justify-between items-center mb-6"
                 >
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-foreground">
                     Coming Soon
                   </h2>
                   <a
@@ -168,7 +186,7 @@ const Index = () => {
               <div>
                 <motion.h2
                   variants={childVariants}
-                  className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6"
+                  className="text-2xl sm:text-3xl font-bold text-foreground mb-6"
                 >
                   Featured Movies
                 </motion.h2>

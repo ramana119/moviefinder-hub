@@ -28,8 +28,8 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
 
   if (!currentMovie) {
     return (
-      <div className="relative w-full h-[70vh] bg-indigo-100 flex items-center justify-center">
-        <p className="text-indigo-800 text-xl">Loading featured movies...</p>
+      <div className="relative w-full h-[70vh] bg-gray-900 flex items-center justify-center">
+        <p className="text-primary text-xl">Loading featured movies...</p>
       </div>
     );
   }
@@ -47,7 +47,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
         >
           {/* Background Image with simplified overlay */}
           <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-black/30 z-10"></div>
+            <div className="absolute inset-0 bg-black/50 z-10"></div>
             <div
               className="absolute inset-0 z-0 bg-cover bg-center"
               style={{
@@ -55,13 +55,12 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
                 backgroundPosition: "center 25%",
               }}
             ></div>
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90 z-20"></div>
           </div>
 
           <div className="relative z-30 container mx-auto h-full px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
             <div className="max-w-3xl mt-20">
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-xs sm:text-sm px-3 py-1.5 bg-indigo-500/80 text-white font-medium rounded-full">
+                <span className="text-xs sm:text-sm px-3 py-1.5 bg-primary/80 text-primary-foreground font-medium rounded-full">
                   Now Showing
                 </span>
                 <div className="flex items-center gap-2 text-white text-xs sm:text-sm">
@@ -128,7 +127,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
               >
                 <Button
                   size="lg"
-                  className="font-medium rounded-full bg-indigo-600 hover:bg-indigo-700"
+                  className="font-medium rounded-full bg-primary hover:bg-primary/90"
                   asChild
                 >
                   <Link to={`/movie/${currentMovie.id}`}>
@@ -163,7 +162,7 @@ const FeaturedMovie = ({ movies }: FeaturedMovieProps) => {
             key={index}
             onClick={() => handleIndicatorClick(index)}
             className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? "w-8 bg-white" : "w-2 bg-white/50"
+              index === currentIndex ? "w-8 bg-primary" : "w-2 bg-white/50"
             }`}
             aria-label={`View slide ${index + 1}`}
           />
