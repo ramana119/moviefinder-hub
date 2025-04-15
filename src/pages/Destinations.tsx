@@ -8,8 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 
 const Destinations: React.FC = () => {
-  const { filteredDestinations, loading, clearFilters } = useDestinations();
+  const { destinations, loading, clearFilters, filteredDestinations } = useDestinations();
   const [visibleCount, setVisibleCount] = useState(9); // Number of destinations to show initially
+  
+  const destinationsToShow = filteredDestinations || destinations;
   
   const loadMore = () => {
     setVisibleCount((prev) => prev + 9);
@@ -42,7 +44,7 @@ const Destinations: React.FC = () => {
               </div>
             ) : (
               <>
-                {filteredDestinations.length === 0 ? (
+                {destinationsToShow.length === 0 ? (
                   <div className="text-center py-12">
                     <h3 className="text-xl font-medium mb-2">No destinations found</h3>
                     <p className="text-gray-600 mb-6">
@@ -54,12 +56,12 @@ const Destinations: React.FC = () => {
                   <>
                     <div className="mb-4 flex justify-between items-center">
                       <p className="text-muted-foreground">
-                        Found {filteredDestinations.length} destinations
+                        Found {destinationsToShow.length} destinations
                       </p>
                     </div>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredDestinations
+                      {destinationsToShow
                         .slice(0, visibleCount)
                         .map((destination) => (
                           <DestinationCard
@@ -69,7 +71,7 @@ const Destinations: React.FC = () => {
                         ))}
                     </div>
                     
-                    {visibleCount < filteredDestinations.length && (
+                    {visibleCount < destinationsToShow.length && (
                       <div className="mt-8 text-center">
                         <Button onClick={loadMore} variant="outline">
                           Load More

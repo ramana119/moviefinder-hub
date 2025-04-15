@@ -1,4 +1,3 @@
-
 import { Destination } from '../types';
 
 export const destinations: Destination[] = [
@@ -13,6 +12,7 @@ export const destinations: Destination[] = [
       lng: -75.6972
     },
     images: ["valley1.jpg", "valley2.jpg"],
+    image: "valley1.jpg",
     price: 299,
     attractions: ["Waterfall Trail", "Mountain View Point"],
     tags: ["nature", "hiking", "peaceful"],
@@ -25,7 +25,8 @@ export const destinations: Destination[] = [
       "14:00": 70,
       "16:00": 60,
       "18:00": 40
-    }
+    },
+    openingHours: "6:00 AM - 6:00 PM"
   },
   {
     id: "dest_2",

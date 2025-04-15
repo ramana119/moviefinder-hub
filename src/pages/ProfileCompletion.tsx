@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -6,257 +5,204 @@ import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from '@/components/ui/command';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const ProfileCompletion: React.FC = () => {
-  const { completeProfile, currentUser } = useAuth();
+  const { completeProfile } = useAuth();
   const navigate = useNavigate();
-  
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [emergencyContact, setEmergencyContact] = useState('');
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [newsletterEnabled, setNewsletterEnabled] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [address, setAddress] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [dob, setDob] = useState<Date | undefined>(undefined);
+  const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
+  const [travelFrequency, setTravelFrequency] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { toast } = useToast();
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    
-    if (!phoneNumber.trim()) {
-      newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\d{10}$/.test(phoneNumber)) {
-      newErrors.phoneNumber = 'Phone number must be 10 digits';
-    }
-    
-    if (!address.trim()) {
-      newErrors.address = 'Address is required';
-    }
-    
-    if (!city.trim()) {
-      newErrors.city = 'City is required';
-    }
-    
-    if (!state.trim()) {
-      newErrors.state = 'State is required';
-    }
-    
-    if (!zipCode.trim()) {
-      newErrors.zipCode = 'ZIP code is required';
-    } else if (!/^\d{6}$/.test(zipCode)) {
-      newErrors.zipCode = 'ZIP code must be 6 digits';
-    }
-    
-    if (!emergencyContact.trim()) {
-      newErrors.emergencyContact = 'Emergency contact is required';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const destinationOptions = [
+    { value: 'beach', label: 'Beach' },
+    { value: 'mountains', label: 'Mountains' },
+    { value: 'city', label: 'City' },
+    { value: 'countryside', label: 'Countryside' }
+  ];
 
+  const frequencyOptions = [
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' }
+  ];
+
+  // Fix the phoneNumber property in the form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateForm()) {
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
+    if (!firstName || !lastName) return;
+
     try {
+      setIsSubmitting(true);
+      
+      // Update profile data structure to match the expected type
+      const profileData = {
+        address: address,
+        phone: phoneNumber,  // Correctly use phone instead of phoneNumber
+        dob: dob ? dob.toISOString() : undefined,
+        preferredDestinations: selectedDestinations,
+        travelFrequency: travelFrequency
+      };
+      
       await completeProfile({
-        phoneNumber,
-        address,
-        city,
-        state,
-        zipCode,
-        emergencyContact,
-        preferences: {
-          notifications: notificationsEnabled,
-          newsletter: newsletterEnabled
-        }
+        firstName,
+        lastName
       });
       
-      navigate('/destinations');
+      toast({
+        title: "Profile Completed",
+        description: "Your profile has been successfully updated.",
+      });
+      
+      navigate('/');
     } catch (error) {
-      console.error('Failed to complete profile:', error);
+      console.error('Profile completion error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete your profile. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  if (!currentUser) {
-    return (
-      <Layout>
-        <div className="container mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Please log in to complete your profile</h1>
-          <Button onClick={() => navigate('/login')}>Go to Login</Button>
-        </div>
-      </Layout>
-    );
-  }
 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Complete Your Profile</h1>
-          <p className="text-gray-600">We need some additional information to complete your profile</p>
+          <p className="text-gray-600">
+            Tell us a bit about yourself to get personalized recommendations
+          </p>
         </div>
         
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>
-              This information will be used for your bookings and emergencies
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  placeholder="Enter your 10-digit phone number"
-                  maxLength={10}
-                  className={errors.phoneNumber ? 'border-red-500' : ''}
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto space-y-6">
+          <div>
+            <Label htmlFor="firstName">First Name</Label>
+            <Input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="lastName">Last Name</Label>
+            <Input
+              id="lastName"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              type="text"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Input
+              id="phoneNumber"
+              type="tel"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="dob">Date of Birth</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant={"outline"}
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !dob && "text-muted-foreground"
+                  )}
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  {dob ? format(dob, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dob}
+                  onSelect={setDob}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date('1900-01-01')
+                  }
+                  initialFocus
                 />
-                {errors.phoneNumber && (
-                  <p className="text-sm text-red-500">{errors.phoneNumber}</p>
-                )}
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Enter your address"
-                  className={errors.address ? 'border-red-500' : ''}
-                />
-                {errors.address && (
-                  <p className="text-sm text-red-500">{errors.address}</p>
-                )}
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Enter your city"
-                    className={errors.city ? 'border-red-500' : ''}
-                  />
-                  {errors.city && (
-                    <p className="text-sm text-red-500">{errors.city}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="state">State</Label>
-                  <Input
-                    id="state"
-                    type="text"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="Enter your state"
-                    className={errors.state ? 'border-red-500' : ''}
-                  />
-                  {errors.state && (
-                    <p className="text-sm text-red-500">{errors.state}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="zipCode">ZIP Code</Label>
-                  <Input
-                    id="zipCode"
-                    type="text"
-                    value={zipCode}
-                    onChange={(e) => setZipCode(e.target.value)}
-                    placeholder="Enter your 6-digit ZIP code"
-                    maxLength={6}
-                    className={errors.zipCode ? 'border-red-500' : ''}
-                  />
-                  {errors.zipCode && (
-                    <p className="text-sm text-red-500">{errors.zipCode}</p>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="emergencyContact">Emergency Contact</Label>
-                  <Input
-                    id="emergencyContact"
-                    type="tel"
-                    value={emergencyContact}
-                    onChange={(e) => setEmergencyContact(e.target.value)}
-                    placeholder="Emergency contact number"
-                    className={errors.emergencyContact ? 'border-red-500' : ''}
-                  />
-                  {errors.emergencyContact && (
-                    <p className="text-sm text-red-500">{errors.emergencyContact}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="space-y-4 pt-4">
-                <h3 className="text-lg font-medium">Preferences</h3>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="notifications" className="cursor-pointer">
-                    Enable notifications
-                  </Label>
-                  <Switch
-                    id="notifications"
-                    checked={notificationsEnabled}
-                    onCheckedChange={setNotificationsEnabled}
-                  />
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="newsletter" className="cursor-pointer">
-                    Subscribe to newsletter
-                  </Label>
-                  <Switch
-                    id="newsletter"
-                    checked={newsletterEnabled}
-                    onCheckedChange={setNewsletterEnabled}
-                  />
-                </div>
-              </div>
-            </form>
-          </CardContent>
-          <CardFooter>
-            <Button 
-              onClick={handleSubmit} 
-              className="w-full" 
-              disabled={isSubmitting}
+              </PopoverContent>
+            </Popover>
+          </div>
+          
+          <div>
+            <Label htmlFor="preferredDestinations">Preferred Destinations</Label>
+            <Select
+              onValueChange={(value) => setSelectedDestinations([value])}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                'Complete Profile'
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a destination" />
+              </SelectTrigger>
+              <SelectContent>
+                {destinationOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <Label htmlFor="travelFrequency">Travel Frequency</Label>
+            <Select
+              onValueChange={(value) => setTravelFrequency(value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a frequency" />
+              </SelectTrigger>
+              <SelectContent>
+                {frequencyOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Complete Profile'}
+          </Button>
+        </form>
       </div>
     </Layout>
   );

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Destination } from '../types';
@@ -44,20 +43,14 @@ const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <Card 
-          className="overflow-hidden border-2 hover:border-primary transition-all duration-300"
-          style={cardStyles}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="relative">
-            <AspectRatio ratio={16 / 9}>
-              <img 
-                src={destination.images[0]} 
-                alt={destination.name} 
-                className="w-full h-full object-cover"
-              />
-            </AspectRatio>
+        <Card className="h-full overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col">
+          <div className="relative h-48 overflow-hidden">
+            <img
+              src={destination.images[0] || destination.image}
+              alt={destination.name}
+              className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
             
             <div className="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/70 to-transparent text-white">
               <h3 className="text-xl font-semibold truncate">{destination.name}</h3>

@@ -1,7 +1,7 @@
-
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
+  currentUser: User | null;
   isLoading: boolean;
   error: string | null;
   login: (data: LoginData) => Promise<void>;
@@ -29,6 +29,7 @@ export interface User {
   profileData?: {
     address?: string;
     phone?: string;
+    phoneNumber?: string;
     dob?: string;
     preferredDestinations?: string[];
     travelFrequency?: string;
@@ -63,6 +64,7 @@ export interface DestinationContextType {
   filters?: DestinationFilters;
   setFilters?: (filters: Partial<DestinationFilters>) => void;
   clearFilters?: () => void;
+  filteredDestinations?: Destination[];
 }
 
 export interface BookingContextType {
@@ -143,6 +145,7 @@ export interface GuideType {
   pricePerDay: number;
   languages: string[];
   imageUrl: string;
+  image?: string;
   rating: number;
   experience: number;
   specialties?: string[];
@@ -152,7 +155,6 @@ export interface GuideType {
     comment: string;
     userId: string;
   }[];
-  image?: string; // For backward compatibility
 }
 
 export interface Destination {
@@ -166,7 +168,13 @@ export interface Destination {
     lng: number;
   };
   images: string[];
-  price?: number;
+  image?: string;
+  price?: number | {
+    adult: number;
+    child: number;
+    foreigner?: number;
+    includes?: string[];
+  };
   attractions?: string[];
   tags?: string[];
   rating?: number;
@@ -176,6 +184,7 @@ export interface Destination {
   bestTimeToVisit?: string;
   peakHours?: string[];
   offPeakHours?: string[];
+  openingHours?: string;
 }
 
 export interface TripPlan {

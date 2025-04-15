@@ -1,4 +1,3 @@
-
 // src/types/index.ts
 export interface Destination {
   id: string;
@@ -7,7 +6,7 @@ export interface Destination {
   state: string;
   description: string;
   rating: number;
-  imageUrl: string;
+  imageUrl?: string;
   coordinates: {
     lat: number;
     lng: number;
@@ -17,8 +16,14 @@ export interface Destination {
   crowdData?: CrowdData;
   image?: string;
   images: string[];
-  price?: number;
+  price?: number | {
+    adult: number;
+    child: number;
+    foreigner?: number;
+    includes?: string[];
+  };
   tags?: string[];
+  openingHours?: string;
 }
 
 export interface HotelType {
@@ -39,6 +44,7 @@ export interface HotelType {
     address: string;
     distanceFromCenter: number;
     proximityScore: number;
+    nearbyAttractions?: Array<{ name: string; distance: number; }>;
   };
   checkInTime?: string;
   checkOutTime?: string;
@@ -208,6 +214,7 @@ export interface DestinationContextType {
   filters?: DestinationFilters;
   setFilters?: (filters: Partial<DestinationFilters>) => void;
   clearFilters?: () => void;
+  filteredDestinations?: Destination[];
 }
 
 export interface BookingContextType {
@@ -219,6 +226,9 @@ export interface BookingContextType {
   getBookingById: (id: string) => Booking | undefined;
   cancelBooking: (bookingId: string) => Promise<void>;
   saveTripPlan: (tripPlan: TripPlan) => Promise<void>;
+  addBooking: (bookingData: any) => Promise<void>;
+  getUserBookings: (userId: string) => Booking[];
+  getUserTripPlans: (userId: string) => TripPlan[];
 }
 
 export interface TripPlanningContextType {

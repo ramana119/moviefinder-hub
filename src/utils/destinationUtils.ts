@@ -15,20 +15,6 @@ export const getEnhancedCrowdData = (destinationId: string, crowdData: CrowdData
   // Create a new object with the crowd data
   const enhancedData: Record<string, number> = { ...crowdData };
   
-  // Add premium insights as a separate object (not directly to the CrowdData)
-  const premiumInfo = {
-    bestPhotoSpots: [
-      "Northwest corner at sunrise",
-      "Main courtyard in late afternoon"
-    ],
-    secretEntrances: [
-      "South gate - 40% less crowded in mornings"
-    ],
-    localTips: [
-      `Visit early morning for fewer crowds`
-    ]
-  };
-  
   // Return only the enhanced crowd data
   return enhancedData;
 };

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDestinations } from '../context/DestinationContext';
@@ -61,13 +62,23 @@ const DestinationDetail: React.FC = () => {
     );
   }
 
+  // Helper to safely get price data
+  const getPriceInfo = () => {
+    if (typeof destination.price === 'object' && destination.price !== null) {
+      return destination.price;
+    }
+    return { adult: typeof destination.price === 'number' ? destination.price : 0, child: 0 };
+  };
+
+  const priceInfo = getPriceInfo();
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="relative h-[300px] md:h-[400px] mb-8 rounded-lg overflow-hidden shadow-md">
           <img 
-            src={destination.image} 
+            src={destination.images[0] || destination.image} 
             alt={destination.name}
             className="w-full h-full object-cover"
             loading="eager"
@@ -114,7 +125,7 @@ const DestinationDetail: React.FC = () => {
                       <Calendar className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Best Time to Visit</p>
-                        <p className="text-sm text-gray-600">{destination.bestTimeToVisit}</p>
+                        <p className="text-sm text-gray-600">{destination.bestTimeToVisit || 'Any time'}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -124,12 +135,12 @@ const DestinationDetail: React.FC = () => {
                         <p className="text-sm text-gray-600">{destination.openingHours || '9 AM - 6 PM'}</p>
                       </div>
                     </div>
-                    {destination.price.includes && destination.price.includes.length > 0 && (
+                    {typeof priceInfo === 'object' && priceInfo.includes && priceInfo.includes.length > 0 && (
                       <div className="flex items-start gap-3">
                         <Camera className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                         <div>
                           <p className="font-medium">Entry Includes</p>
-                          <p className="text-sm text-gray-600">{destination.price.includes.join(', ')}</p>
+                          <p className="text-sm text-gray-600">{priceInfo.includes.join(', ')}</p>
                         </div>
                       </div>
                     )}
@@ -146,10 +157,10 @@ const DestinationDetail: React.FC = () => {
               {/* Photos Tab */}
               <TabsContent value="photos" className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {Array.from({ length: 6 }).map((_, index) => (
+                  {destination.images.map((image, index) => (
                     <img 
                       key={index}
-                      src={destination.image} 
+                      src={image || destination.image} 
                       alt={`${destination.name} photo ${index + 1}`}
                       className="w-full h-48 object-cover rounded-lg shadow-sm"
                       loading="lazy"
@@ -174,7 +185,7 @@ const DestinationDetail: React.FC = () => {
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-bold">Plan Your Visit</h2>
                 
-                {destination.price.adult === 0 ? (
+                {(typeof priceInfo === 'object' && priceInfo.adult === 0) || (typeof destination.price === 'number' && destination.price === 0) ? (
                   <div className="bg-green-50 p-4 rounded-lg border border-green-100">
                     <p className="text-lg font-bold text-green-800">Free Entry</p>
                     <p className="text-sm text-green-600">Open to all visitors</p>
@@ -187,30 +198,30 @@ const DestinationDetail: React.FC = () => {
                           <p className="font-medium">Indian Adult</p>
                           <p className="text-sm text-gray-500">(12+ years)</p>
                         </div>
-                        <p className="text-lg font-bold">{formatPrice(destination.price.adult)}</p>
+                        <p className="text-lg font-bold">{formatPrice(typeof priceInfo === 'object' ? priceInfo.adult : (typeof destination.price === 'number' ? destination.price : 0))}</p>
                       </div>
                     </div>
                     
-                    {destination.price.child > 0 && (
+                    {typeof priceInfo === 'object' && priceInfo.child > 0 && (
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">Indian Child</p>
                             <p className="text-sm text-gray-500">(5-12 years)</p>
                           </div>
-                          <p className="text-lg font-bold">{formatPrice(destination.price.child)}</p>
+                          <p className="text-lg font-bold">{formatPrice(priceInfo.child)}</p>
                         </div>
                       </div>
                     )}
                     
-                    {destination.price.foreigner && destination.price.foreigner > 0 && (
+                    {typeof priceInfo === 'object' && priceInfo.foreigner && priceInfo.foreigner > 0 && (
                       <div className="bg-purple-50 p-4 rounded-lg border border-purple-100">
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">Foreign Visitor</p>
                             <p className="text-sm text-gray-500">(All ages)</p>
                           </div>
-                          <p className="text-lg font-bold">{formatPrice(destination.price.foreigner)}</p>
+                          <p className="text-lg font-bold">{formatPrice(priceInfo.foreigner)}</p>
                         </div>
                       </div>
                     )}
@@ -244,7 +255,7 @@ const DestinationDetail: React.FC = () => {
                     >
                       <div className="flex items-center gap-3 p-2">
                         <img 
-                          src={similar.image} 
+                          src={similar.images[0] || similar.image} 
                           alt={similar.name} 
                           className="w-12 h-12 object-cover rounded-md"
                           loading="lazy"

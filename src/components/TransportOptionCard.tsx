@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,8 +19,8 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({ transport, on
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">{transport.name}</h3>
-            <p className="text-sm text-gray-500">{transport.operator}</p>
+            <h3 className="text-lg font-semibold">{transport.name || transport.type}</h3>
+            <p className="text-sm text-gray-500">{transport.operator || 'Standard Service'}</p>
           </div>
           <div className="text-right">
             <Badge variant="secondary">₹{transport.pricePerPerson}</Badge>
@@ -27,7 +28,7 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({ transport, on
         </div>
         <div className="mt-2 text-sm">
           <p>Type: {transport.type}</p>
-          <p>Travel Time: {transport.travelTime} hours</p>
+          <p>Travel Time: {transport.travelTime || 'Unknown'} hours</p>
         </div>
         <div className="mt-3">
           {transport.amenities.map((amenity, index) => (
@@ -42,4 +43,3 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({ transport, on
 };
 
 export default TransportOptionCard;
-
