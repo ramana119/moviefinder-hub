@@ -3,6 +3,7 @@ import { Destination, DestinationContextType, CrowdData, CrowdLevel } from '../t
 import { useToast } from '@/hooks/use-toast';
 import { indiaDestinations } from '../data/destinations';
 import { useAuth } from './AuthContext';
+import { getEnhancedCrowdData as getEnhancedCrowdDataUtil, getPremiumInsights } from '../utils/destinationUtils';
 
 const DestinationContext = createContext<DestinationContextType | undefined>(undefined);
 
@@ -96,8 +97,16 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }, [destinations, searchQuery, filters]);
 
   // Get enhanced crowd data with premium features
-  const getEnhancedCrowdData = (destinationId: string, crowdData: CrowdData) => {
-    const hasBooking = currentUser?.bookings?.some(b => b.destinationIds.includes(destinationId));
+  const getEnhancedCrowdData = (destinationId: string, crowdData: CrowdData): CrowdData => {
+    const hasBooking = currentUser?.bookings?.some(bookingId => {
+      // Check if this booking is for this destination
+      const booking = localStorage.getItem(`booking_${bookingId}`);
+      if (booking) {
+        const parsedBooking = JSON.parse(booking);
+        return parsedBooking.destinationId === destinationId;
+      }
+      return false;
+    });
     
     if (!currentUser?.isPremium && !hasBooking) {
       // Return limited data for free users
@@ -109,10 +118,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
 
     // For premium users or those with bookings
-    return {
-      ...crowdData,
-      premiumInsights: hasBooking ? getBookingInsights(destinationId) : null
-    };
+    return getEnhancedCrowdDataUtil(destinationId, crowdData);
   };
 
   // Get booking insights for premium users
@@ -120,18 +126,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     const destination = destinations.find(d => d.id === destinationId);
     if (!destination) return null;
 
-    return {
-      bestPhotoSpots: [
-        "Northwest corner at sunrise",
-        "Main courtyard in late afternoon"
-      ],
-      secretEntrances: [
-        "South gate - 40% less crowded in mornings"
-      ],
-      localTips: [
-        `Visit ${destination.name}'s east side for authentic local food`
-      ]
-    };
+    return getPremiumInsights(destinationId);
   };
 
   // Determine current crowd level
@@ -212,7 +207,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     setSearchQuery('');
   };
 
-  const getDestinationById = (id: string) => {
+  const getDestinationById = (id: string): Destination | undefined => {
     return destinations.find((dest) => dest.id === id);
   };
 

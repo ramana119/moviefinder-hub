@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Star, Users } from 'lucide-react';
@@ -31,8 +32,7 @@ const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
   };
 
   const getStartingPrice = () => {
-    if (destination.price.adult === 0) return 'Free Entry';
-    return `From ${formatPrice(destination.price.adult)}`;
+    return `From ${formatPrice(destination.price)}`;
   };
 
   return (

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { format } from 'date-fns';
 import { 
@@ -27,6 +28,7 @@ import { TripItineraryDay, HotelType } from '../types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTripPlanning } from '../context/TripPlanningContext';
+import { getTransportAmenities } from '../utils/tripPlanningUtils';
 
 interface TripItineraryProps {
   itinerary: TripItineraryDay[];
@@ -40,8 +42,7 @@ const TripItinerary: React.FC<TripItineraryProps> = ({
   isPremium = false
 }) => {
   const [expandedDays, setExpandedDays] = useState<Record<number, boolean>>({});
-  const { getTransportAmenities } = useTripPlanning();
-
+  
   // Calculate travel details based on the transport type
   const calculateTravelDetails = (type: string) => {
     switch(type) {
@@ -114,44 +115,63 @@ const TripItinerary: React.FC<TripItineraryProps> = ({
   };
 
   // Render hotel information
-  const renderHotelInfo = (hotel: HotelType) => (
-    <div className="border rounded-lg p-3 bg-gray-50">
-      <div className="flex justify-between">
-        <div>
-          <p className="font-medium">{hotel.name}</p>
-          <div className="flex items-center mt-1 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span>{hotel.location.distanceFromCenter.toFixed(1)} km from center</span>
-          </div>
-          <div className="flex items-center mt-1">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                className={`h-4 w-4 ${i < hotel.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="text-right">
-          <div className="text-sm font-medium">
-            ₹{hotel.pricePerPerson}/person
-          </div>
-          {hotel.checkInTime && (
-            <div className="text-xs text-gray-500 mt-1">
-              {hotel.checkInTime} - {hotel.checkOutTime}
+  const renderHotelInfo = (hotelData: any) => {
+    // If it's already a string or undefined/null, just return a placeholder
+    if (typeof hotelData === 'string' || !hotelData) {
+      return (
+        <div className="border rounded-lg p-3 bg-gray-50">
+          <div className="flex justify-between">
+            <div>
+              <p className="font-medium">Hotel info unavailable</p>
             </div>
-          )}
+          </div>
+        </div>
+      );
+    }
+    
+    // If it's a hotel object, render its details
+    const hotel = hotelData as HotelType;
+    return (
+      <div className="border rounded-lg p-3 bg-gray-50">
+        <div className="flex justify-between">
+          <div>
+            <p className="font-medium">{hotel.name}</p>
+            {hotel.location && (
+              <div className="flex items-center mt-1 text-sm text-gray-600">
+                <MapPin className="h-4 w-4 mr-1" />
+                <span>{hotel.location.distanceFromCenter.toFixed(1)} km from center</span>
+              </div>
+            )}
+            <div className="flex items-center mt-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-4 w-4 ${i < hotel.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-medium">
+              ₹{hotel.pricePerPerson}/person
+            </div>
+            {hotel.checkInTime && (
+              <div className="text-xs text-gray-500 mt-1">
+                {hotel.checkInTime} - {hotel.checkOutTime}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-1 mt-2">
+          {hotel.amenities.slice(0, 4).map((amenity, i) => (
+            <span key={i} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+              {amenity}
+            </span>
+          ))}
         </div>
       </div>
-      <div className="flex flex-wrap gap-1 mt-2">
-        {hotel.amenities.slice(0, 4).map((amenity, i) => (
-          <span key={i} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
-            {amenity}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Render crowd level indicator
   const renderCrowdLevel = (level: string, percentage: number) => {

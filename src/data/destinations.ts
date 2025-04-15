@@ -27,18 +27,10 @@ const generateCrowdData = () => {
   return crowdData;
 };
 
-// Helper function for consistent pricing structure
-const createPrice = (
-  adult: number, 
-  child: number = Math.floor(adult * 0.6), 
-  foreigner: number = adult * 4,
-  includes: string[] = []
-) => ({
-  adult,
-  child,
-  foreigner,
-  includes
-});
+// Convert price objects to simple number values
+const getSimplePrice = (
+  adult: number
+) => adult;
 
 export const indiaDestinations: Destination[] = [
   {
@@ -60,7 +52,7 @@ export const indiaDestinations: Destination[] = [
       '20:00': 20,
       '22:00': 10
     },
-    price: createPrice(1100, 600, 2000, ['Main mausoleum', 'Gardens', 'Mosque']),
+    price: 1100,
     rating: 4.8,
     coordinates: {
       lat: 27.1751,
@@ -88,7 +80,7 @@ export const indiaDestinations: Destination[] = [
       '20:00': 15,
       '22:00': 5
     },
-    price: createPrice(700, 400, 1500, ['Palace complex', 'Museum', 'Audio guide']),
+    price: 700,
     rating: 4.5,
     coordinates: {
       lat: 26.9258,
@@ -256,7 +248,7 @@ export const indiaDestinations: Destination[] = [
       '20:00': 90,
       '22:00': 65
     },
-    price: createPrice(0, 0, 0, ['Temple visit', 'Community kitchen']),
+    price: 0,
     rating: 4.9,
     coordinates: {
       lat: 31.6200,
@@ -284,7 +276,7 @@ export const indiaDestinations: Destination[] = [
       '20:00': 40,
       '22:00': 15
     },
-    price: createPrice(500, 250, 2000, ['Salt desert access', 'Cultural shows']),
+    price: 500,
     rating: 4.5,
     coordinates: {
       lat: 23.7337,
@@ -465,7 +457,7 @@ export const indiaDestinations: Destination[] = [
     description: 'Famous for its sprawling tea plantations, misty hills, and cool climate, Munnar offers breathtaking views of the Western Ghats and diverse flora and fauna.',
     image: 'https://images.unsplash.com/photo-1590689860171-2e105100eac1?w=800&auto=format&fit=crop',
     crowdData: generateCrowdData(),
-    price: createPrice(400, 200, 1600, ['Tea estate tours', 'Museum entry']),
+    price: 400,
     rating: 4.7,
     coordinates: {
       lat: 10.0889,
@@ -482,7 +474,7 @@ export const indiaDestinations: Destination[] = [
     description: 'A UNESCO World Heritage Site, this 73-meter tall tower of victory is an example of Indo-Islamic architecture with intricate carvings and verses from the Quran.',
     image: 'https://images.unsplash.com/photo-1548013146-72479768bada?w=800&auto=format&fit=crop',
     crowdData: generateCrowdData(),
-    price: createPrice(350, 175, 1400, ['Minar access', 'Archaeological complex']),
+    price: 350,
     rating: 4.5,
     coordinates: {
       lat: 28.5245,
