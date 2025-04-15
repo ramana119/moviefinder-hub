@@ -9,8 +9,13 @@ export const transports: TransportType[] = [
     pricePerPerson: 300,
     travelTime: 8,
     amenities: ['Air conditioning', 'Comfortable seating'],
-    busClass: 'standard',
-    seatType: 'regular'
+    transportClass: 'standard',
+    operator: 'City Express',
+    departureTime: '07:00',
+    arrivalTime: '15:00',
+    totalSeats: 40,
+    availableSeats: 35,
+    rating: 4.0
   },
   {
     id: 'transport_002',
@@ -19,28 +24,43 @@ export const transports: TransportType[] = [
     pricePerPerson: 600,
     travelTime: 8,
     amenities: ['Air conditioning', 'Reclining seats', 'TV', 'Snacks', 'Charging points'],
-    busClass: 'luxury',
-    seatType: 'sleeper'
+    transportClass: 'luxury',
+    operator: 'Royal Travels',
+    departureTime: '21:00',
+    arrivalTime: '05:00',
+    totalSeats: 30,
+    availableSeats: 25,
+    rating: 4.5
   },
   {
     id: 'transport_003',
-    name: 'Passenger Train',
+    name: 'Express Train',
     type: 'train',
     pricePerPerson: 400,
     travelTime: 6,
-    amenities: ['Air conditioning', 'Comfortable seating', 'Food service'],
-    class: 'Second Class',
-    berthOption: 'sleeper'
+    amenities: ['Air conditioning', 'Food service'],
+    transportClass: 'ac-chair',
+    operator: 'Indian Railways',
+    departureTime: '06:00',
+    arrivalTime: '12:00',
+    totalSeats: 72,
+    availableSeats: 50,
+    rating: 4.2
   },
   {
     id: 'transport_004',
-    name: 'Express Train',
+    name: 'Premium Train',
     type: 'train',
     pricePerPerson: 800,
     travelTime: 4,
-    amenities: ['Air conditioning', 'Comfortable seating', 'Food service', 'Charging points', 'Faster service'],
-    class: 'First Class',
-    berthOption: 'AC'
+    amenities: ['Air conditioning', 'Premium meals', 'Bedding', 'Shower'],
+    transportClass: 'ac-sleeper',
+    operator: 'Indian Railways',
+    departureTime: '22:00',
+    arrivalTime: '06:00',
+    totalSeats: 72,
+    availableSeats: 45,
+    rating: 4.7
   },
   {
     id: 'transport_005',
@@ -48,9 +68,14 @@ export const transports: TransportType[] = [
     type: 'flight',
     pricePerPerson: 2500,
     travelTime: 1.5,
-    amenities: ['Air conditioning', 'Basic meal'],
-    cabinClass: 'economy',
-    baggageAllowance: '15kg'
+    amenities: ['Basic meal', 'Entertainment system'],
+    transportClass: 'economy',
+    operator: 'Air India',
+    departureTime: '10:00',
+    arrivalTime: '11:30',
+    totalSeats: 180,
+    availableSeats: 120,
+    rating: 4.0
   },
   {
     id: 'transport_006',
@@ -58,9 +83,14 @@ export const transports: TransportType[] = [
     type: 'flight',
     pricePerPerson: 5000,
     travelTime: 1.5,
-    amenities: ['Air conditioning', 'Premium meal', 'Extra legroom', 'Priority boarding'],
-    cabinClass: 'business',
-    baggageAllowance: '30kg'
+    amenities: ['Premium meals', 'Lounge access', 'Priority boarding', 'Extra baggage'],
+    transportClass: 'business',
+    operator: 'Air India',
+    departureTime: '11:00',
+    arrivalTime: '12:30',
+    totalSeats: 30,
+    availableSeats: 20,
+    rating: 4.8
   },
   {
     id: 'transport_007',
@@ -68,9 +98,12 @@ export const transports: TransportType[] = [
     type: 'car',
     pricePerPerson: 700,
     travelTime: 10,
-    amenities: ['Air conditioning', 'Comfortable seating', 'Flexible schedule'],
-    carType: 'sedan',
-    transmission: 'manual'
+    amenities: ['Air conditioning', 'Music system'],
+    transportClass: 'sedan',
+    operator: 'City Cabs',
+    totalSeats: 4,
+    availableSeats: 4,
+    rating: 4.3
   },
   {
     id: 'transport_008',
@@ -78,8 +111,11 @@ export const transports: TransportType[] = [
     type: 'car',
     pricePerPerson: 1400,
     travelTime: 10,
-    amenities: ['Air conditioning', 'Luxury vehicle', 'Comfortable seating', 'Refreshments', 'Flexible schedule'],
-    carType: 'suv',
-    transmission: 'automatic'
+    amenities: ['Premium interiors', 'Entertainment system', 'Refreshments'],
+    transportClass: 'luxury',
+    operator: 'Luxury Rides',
+    totalSeats: 4,
+    availableSeats: 4,
+    rating: 4.9
   }
 ];

@@ -1,4 +1,3 @@
-
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
@@ -18,7 +17,6 @@ export interface User {
   lastName?: string;
   profileComplete?: boolean;
   premiumMember?: boolean;
-  // Missing properties being added
   name?: string;
   fullName?: string;
   password?: string;
@@ -56,7 +54,6 @@ export interface DestinationContextType {
   loading: boolean;
   error: string | null;
   getDestinationById: (id: string) => Destination | undefined;
-  // Adding missing properties
   getCurrentCrowdLevel?: (crowdData?: CrowdData) => CrowdLevel;
   getBestTimeToVisit?: (crowdData?: CrowdData) => string;
   searchQuery?: string;
@@ -87,7 +84,6 @@ export interface Booking {
   totalPrice: number;
   createdAt: string;
   tripPlanId?: string;
-  // Adding compatibility properties
   checkIn?: string;
   timeSlot?: string;
   visitors?: number;
@@ -116,49 +112,52 @@ export interface HotelType {
   checkInTime?: string;
   checkOutTime?: string;
   contact?: string;
-  // Adding compatibility properties
   pricePerNight?: number;
   imageUrl?: string;
 }
 
 export interface TransportType {
   id: string;
+  name: string;
   type: 'bus' | 'train' | 'flight' | 'car';
-  amenities: string[];
   pricePerPerson: number;
-  // Adding compatibility properties
-  name?: string;
-  travelTime?: number;
-  busClass?: string;
-  seatType?: string;
-  class?: string;
-  berthOption?: string;
-  cabinClass?: string;
-  baggageAllowance?: string;
-  carType?: string;
-  transmission?: string;
+  travelTime: number;
+  amenities: string[];
+  transportClass?: BusType | TrainType | FlightType | CarType;
   operator?: string;
-  airline?: string;
-  rentalCompany?: string;
-  estimatedDuration?: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  totalSeats?: number;
+  availableSeats?: number;
+  rating?: number;
+  cancellationPolicy?: string;
 }
 
 export interface GuideType {
   id: string;
-  destinationId: string;
   name: string;
-  languages: string[];
+  destinationId: string;
   pricePerDay: number;
+  languages: string[];
+  imageUrl: string;
   rating: number;
-  // Adding compatibility properties
-  imageUrl?: string;
+  experience: number;
+  specialties?: string[];
+  availability?: string[];
+  reviews?: {
+    rating: number;
+    comment: string;
+    userId: string;
+  }[];
 }
 
 export interface Destination {
   id: string;
   name: string;
+  city: string;
+  state: string;
   description: string;
-  coordinates?: {
+  coordinates: {
     lat: number;
     lng: number;
   };
@@ -166,14 +165,13 @@ export interface Destination {
   price?: number;
   attractions?: string[];
   tags?: string[];
-  // Adding compatibility properties
-  city?: string;
-  state?: string;
   rating?: number;
-  image?: string;
-  imageUrl?: string;
-  crowdData?: CrowdData;
-  photography?: boolean;
+  crowdData?: {
+    [time: string]: number;
+  };
+  bestTimeToVisit?: string;
+  peakHours?: string[];
+  offPeakHours?: string[];
 }
 
 export interface TripPlan {
@@ -181,24 +179,24 @@ export interface TripPlan {
   userId: string;
   selectedDestinations: string[];
   startDate: string;
+  endDate?: string;
   numberOfDays: number;
   numberOfPeople: number;
-  transportType: 'bus' | 'train' | 'flight' | 'car';
-  travelStyle?: 'base-hotel' | 'mobile';
-  isPremium?: boolean;
-  itinerary: TripItineraryDay[];
-  selectedHotels: string[];
-  hotelProximityScore?: number;
-  createdAt: string;
-  // Adding compatibility properties
-  endDate?: string;
   hotelType?: 'budget' | 'standard' | 'luxury';
   selectedTransport?: string;
+  transportType: 'bus' | 'train' | 'flight' | 'car';
+  transportClass?: BusType | TrainType | FlightType | CarType;
   guideIds?: string[];
   totalCost?: number;
   status?: 'planning' | 'confirmed' | 'cancelled';
+  createdAt: string;
+  isPremium?: boolean;
   sleepTransport?: boolean;
+  travelStyle?: 'base-hotel' | 'mobile';
   photos?: string[];
+  itinerary?: TripItineraryDay[];
+  selectedHotels?: string[];
+  hotelProximityScore?: number;
 }
 
 export interface TripPlanningContextType {
@@ -298,7 +296,6 @@ export interface TripItineraryDay {
     notes?: string;
   }[];
   hotels: string[];
-  // Adding missing properties
   departureTime?: string;
   arrivalTime?: string;
   transportDetails?: {
@@ -312,7 +309,11 @@ export interface TripItineraryDay {
   }[];
 }
 
-// New types to fix the errors
+export type BusType = 'standard' | 'luxury' | 'sleeper' | 'volvo';
+export type TrainType = 'general' | 'sleeper' | 'ac-chair' | 'ac-sleeper';
+export type FlightType = 'economy' | 'business' | 'first-class';
+export type CarType = 'hatchback' | 'sedan' | 'suv' | 'luxury';
+
 export type CrowdLevel = 'low' | 'medium' | 'high';
 
 export interface CrowdData {
@@ -325,4 +326,3 @@ export interface DestinationFilters {
   minPrice: number;
   maxPrice: number;
 }
-
