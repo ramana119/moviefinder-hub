@@ -1,3 +1,4 @@
+
 import { CrowdLevel } from '../types';
 
 // Format price to currency

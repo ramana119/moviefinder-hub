@@ -1,36 +1,11 @@
+import { Destination } from '../types';
 
-import { CrowdData } from '../types';
-
-// Define a type for enhanced crowd data that includes premium insights
-export interface EnhancedCrowdData extends CrowdData {
-  premiumInsights?: {
-    bestPhotoSpots: string[];
-    secretEntrances: string[];
-    localTips: string[];
-  };
-}
-
-// Function to enhance crowd data with premium insights
-export const getEnhancedCrowdData = (destinationId: string, crowdData: CrowdData): CrowdData => {
-  // Create a new object with the crowd data
-  const enhancedData: Record<string, number> = { ...crowdData };
-  
-  // Return only the enhanced crowd data
-  return enhancedData;
-};
-
-// Get the premium insights separately
-export const getPremiumInsights = (destinationId: string) => {
+// Get premium destination insights
+export const getPremiumDestinationInsights = (destination: Destination) => {
+  // Create a generic structure for premium insights
   return {
-    bestPhotoSpots: [
-      "Northwest corner at sunrise",
-      "Main courtyard in late afternoon"
-    ],
-    secretEntrances: [
-      "South gate - 40% less crowded in mornings"
-    ],
-    localTips: [
-      `Visit early morning for fewer crowds`
-    ]
+    bestPhotoSpots: ['Sunrise Point', 'Valley View', 'Mountain Peak'],
+    secretEntrances: ['East Gate (less crowded)', 'North Trail Entrance'],
+    localTips: ['Visit early morning to avoid crowds', 'Try the local cuisine']
   };
 };

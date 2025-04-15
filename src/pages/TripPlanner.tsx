@@ -12,17 +12,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatPrice } from '../utils/helpers';
+import { formatPrice, getBasePrice } from '../utils/helpers';
 import { Loader2, MapPin, Calendar as CalendarIcon, Users, Route, Hotel, Bus, Car, Train, Plane, User, Check, X, Star } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from "@/components/ui/slider"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Slider } from "@/components/ui/slider";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Destination, TransportType, HotelType, GuideType } from '../types';
 
 const TripPlanner: React.FC = () => {
@@ -123,6 +123,10 @@ const TripPlanner: React.FC = () => {
     setSelectedGuides(prev =>
       prev.includes(guideId) ? prev.filter(id => id !== guideId) : [...prev, guideId]
     );
+  };
+
+  const handleSleepTransportChange = (checked: boolean) => {
+    setSleepTransport(checked);
   };
 
   const handleSubmit = async () => {
@@ -430,7 +434,7 @@ const TripPlanner: React.FC = () => {
                   <Checkbox
                     id="sleepTransport"
                     checked={sleepTransport}
-                    onCheckedChange={setSleepTransport}
+                    onCheckedChange={handleSleepTransportChange}
                   />
                   <Label htmlFor="sleepTransport">Include overnight travel</Label>
                 </div>

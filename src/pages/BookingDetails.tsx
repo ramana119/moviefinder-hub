@@ -1,240 +1,97 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useBookings } from "../context/BookingContext";
-import { useTripPlanning } from "../context/TripPlanningContext";
-import { useAuth } from "../context/AuthContext";
-import { useDestinations } from "../context/DestinationContext";
-import Layout from "../components/Layout";
-import TripItinerary from "../components/TripItinerary";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Gallery, GalleryImage } from "@/components/ui/gallery";
-import { format } from "date-fns";
-import { MapPin, Calendar, Users, CreditCard, Route, Hotel, Bus, Car, Train, Plane, Info, Clock, Check, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useBookings } from '../context/BookingContext';
+import { useDestinations } from '../context/DestinationContext';
+import { useAuth } from '../context/AuthContext';
+import Layout from '../components/Layout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { formatPrice } from '../utils/helpers';
+import { format, parseISO } from 'date-fns';
+import { MapPin, Calendar, Users, CreditCard, AlertTriangle, CheckCircle, Clock, ArrowLeft } from 'lucide-react';
+import { Booking, TripPlan } from '../types';
 
 const BookingDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { getBookingById, cancelBooking, getUserTripPlans } = useBookings();
+  const { getDestinationById } = useDestinations();
   const { currentUser } = useAuth();
-  const { getBookingById, getUserTripPlans, cancelBooking } = useBookings();
-  const { getTripPlanById, cancelTripPlan, getDistanceMatrix } = useTripPlanning();
-  const { destinations, getDestinationById } = useDestinations();
-  const { toast } = useToast();
-  const [booking, setBooking] = useState(null);
-  const [tripPlan, setTripPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [distances, setDistances] = useState([]);
-  const [totalDistance, setTotalDistance] = useState(0);
+
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [destination, setDestination] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [showCancelDialog, setShowCancelDialog] = useState<boolean>(false);
+  const [tripPlan, setTripPlan] = useState<TripPlan | null>(null);
 
   useEffect(() => {
-    if (!currentUser) {
-      navigate("/login");
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-
-        if (id?.startsWith("booking_")) {
-          const bookingData = getBookingById(id);
-          if (bookingData) {
-            setBooking(bookingData);
-          } else {
-            toast({
-              title: "Booking not found",
-              description: "We couldn't find this booking",
-              variant: "destructive",
-            });
-            navigate("/bookings");
-          }
-        } else if (id?.startsWith("trip_")) {
-          const tripPlanData = getTripPlanById(id);
-          if (tripPlanData) {
-            setTripPlan(tripPlanData);
-            
-            if (tripPlanData.selectedDestinations?.length > 1) {
-              const matrix = getDistanceMatrix(tripPlanData.selectedDestinations);
-              setDistances(matrix);
-              
-              let totalDist = 0;
-              const visited = new Set();
-              
-              for (let i = 0; i < tripPlanData.selectedDestinations.length - 1; i++) {
-                const fromId = tripPlanData.selectedDestinations[i];
-                const toId = tripPlanData.selectedDestinations[i + 1];
-                const route = matrix.find(r => r.fromId === fromId && r.toId === toId);
-                
-                if (route && !visited.has(`${fromId}-${toId}`)) {
-                  totalDist += route.distanceKm;
-                  visited.add(`${fromId}-${toId}`);
-                }
-              }
-              
-              setTotalDistance(totalDist);
-            }
-          } else {
-            toast({
-              title: "Trip plan not found",
-              description: "We couldn't find this trip plan",
-              variant: "destructive",
-            });
-            navigate("/bookings");
-          }
-        } else {
-          navigate("/bookings");
+    if (id) {
+      const bookingData = getBookingById(id);
+      if (bookingData) {
+        setBooking(bookingData);
+        
+        const dest = getDestinationById(bookingData.destinationId);
+        if (dest) {
+          setDestination(dest);
         }
-      } catch (error) {
-        console.error("Error fetching booking details:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load booking details",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+        
+        // If this booking is linked to a trip plan, fetch it
+        if (bookingData.tripPlanId && currentUser) {
+          const userTripPlans = getUserTripPlans(currentUser.id);
+          const linkedTripPlan = userTripPlans.find(plan => plan.id === bookingData.tripPlanId);
+          if (linkedTripPlan) {
+            setTripPlan(linkedTripPlan);
+          }
+        }
+      } else {
+        // Booking not found, redirect to bookings list
+        navigate('/bookings');
       }
-    };
-
-    fetchData();
-  }, [id, currentUser, navigate]);
-
-  const handleCancel = async () => {
-    try {
-      if (booking) {
-        await cancelBooking(booking.id);
-        toast({
-          title: "Booking Cancelled",
-          description: "Your booking has been cancelled successfully",
-        });
-      } else if (tripPlan) {
-        await cancelTripPlan(tripPlan.id);
-        toast({
-          title: "Trip Plan Cancelled",
-          description: "Your trip plan has been cancelled successfully",
-        });
-      }
-      navigate("/bookings");
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to cancel booking",
-        variant: "destructive",
-      });
     }
-  };
+  }, [id, getBookingById, getDestinationById, navigate, currentUser, getUserTripPlans]);
 
-  const getTravelIcon = (type) => {
-    switch (type) {
-      case "bus":
-        return <Bus className="h-5 w-5" />;
-      case "train":
-        return <Train className="h-5 w-5" />;
-      case "flight":
-        return <Plane className="h-5 w-5" />;
-      case "car":
-        return <Car className="h-5 w-5" />;
-      default:
-        return <Route className="h-5 w-5" />;
-    }
-  };
-
-  const renderDestinationDetails = () => {
-    if (!tripPlan) return null;
-
-    return (
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" /> 
-            Destinations & Distances
-          </CardTitle>
-          <CardDescription>
-            Total trip distance: {Math.round(totalDistance)} km
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {tripPlan.selectedDestinations.map((destId, index) => {
-              const destination = getDestinationById(destId);
-              if (!destination) return null;
-
-              let distanceInfo = null;
-              if (index < tripPlan.selectedDestinations.length - 1) {
-                const nextDestId = tripPlan.selectedDestinations[index + 1];
-                const distanceData = distances.find(
-                  d => d.fromId === destId && d.toId === nextDestId
-                );
-                
-                if (distanceData) {
-                  const travelTime = distanceData.travelTimesByTransport[tripPlan.transportType] || 0;
-                  distanceInfo = (
-                    <div className="text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1">
-                        <Route className="h-4 w-4" />
-                        {Math.round(distanceData.distanceKm)} km to next destination
-                        {" • "}
-                        <Clock className="h-4 w-4 ml-1" />
-                        {Math.round(travelTime)} hours travel time
-                      </span>
-                    </div>
-                  );
-                }
-              }
-
-              return (
-                <div key={destId} className="relative pl-6 pb-4">
-                  {index < tripPlan.selectedDestinations.length - 1 && (
-                    <div className="absolute left-2 top-4 w-0.5 h-full bg-muted"></div>
-                  )}
-                  <div className="absolute left-0 top-1 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs">
-                    {index + 1}
-                  </div>
-                  <div>
-                    <h3 className="font-medium">{destination.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {destination.city}, {destination.state}
-                    </p>
-                    {distanceInfo}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderPhotoGallery = () => {
-    if (!tripPlan || !tripPlan.photos || tripPlan.photos.length === 0) return null;
+  const handleCancelBooking = async () => {
+    if (!booking) return;
     
-    return (
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Trip Photos</CardTitle>
-          <CardDescription>Photos from your journey</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Gallery className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {tripPlan.photos.map((photo, index) => (
-              <GalleryImage key={index} src={photo} alt={`Trip photo ${index + 1}`} className="w-full h-32 object-cover rounded-md" />
-            ))}
-          </Gallery>
-        </CardContent>
-      </Card>
-    );
+    setIsLoading(true);
+    try {
+      await cancelBooking(booking.id);
+      setBooking(prev => prev ? { ...prev, status: 'cancelled' } : null);
+      setShowCancelDialog(false);
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (loading) {
+  const formatDate = (dateString: string) => {
+    try {
+      return format(parseISO(dateString), 'PPP');
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  if (!booking || !destination) {
     return (
       <Layout>
-        <div className="container py-10">
-          <h1 className="text-2xl font-bold mb-6">Loading booking details...</h1>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center mb-6">
+            <Button variant="ghost" onClick={() => navigate('/bookings')} className="mr-2">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Bookings
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="pt-6">
+              <p>Loading booking details...</p>
+            </CardContent>
+          </Card>
         </div>
       </Layout>
     );
@@ -242,178 +99,177 @@ const BookingDetails = () => {
 
   return (
     <Layout>
-      <div className="container py-10">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-2/3 space-y-6">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">
-                {tripPlan ? "Trip Plan Details" : "Booking Details"}
-              </h1>
-              <Button
-                variant="outline"
-                onClick={() => navigate("/bookings")}
-              >
-                Back to Bookings
-              </Button>
-            </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" onClick={() => navigate('/bookings')} className="mr-2">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Bookings
+          </Button>
+          <h1 className="text-2xl font-bold">Booking Details</h1>
+        </div>
 
-            {booking && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5" />
-                    {getDestinationById(booking.destinationId)?.name || "Destination"}
-                  </CardTitle>
-                  <CardDescription>
-                    {getDestinationById(booking.destinationId)?.city}, {getDestinationById(booking.destinationId)?.state}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                    <span>
-                      Check-in: {format(new Date(booking.checkIn), "PPP")} at {booking.timeSlot}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                    <span>{booking.visitors} visitors</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span>
-                      Total: ₹{booking.totalAmount.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Info className="h-5 w-5 text-muted-foreground" />
-                    <span>Ticket Type: {booking.ticketType}</span>
-                  </div>
-                  <Badge variant={booking.status === "confirmed" ? "success" : "destructive"}>
-                    {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                  </Badge>
-                </CardContent>
-                {booking.status === "confirmed" && (
-                  <CardFooter>
-                    <Button variant="destructive" onClick={handleCancel}>
-                      Cancel Booking
-                    </Button>
-                  </CardFooter>
-                )}
-              </Card>
-            )}
+        {booking.status === 'cancelled' && (
+          <Alert variant="destructive" className="mb-6">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Booking Cancelled</AlertTitle>
+            <AlertDescription>
+              This booking has been cancelled and is no longer valid.
+            </AlertDescription>
+          </Alert>
+        )}
 
-            {tripPlan && (
-              <>
-                <Card>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>
-                          {tripPlan.selectedDestinations.length} Destination{tripPlan.selectedDestinations.length > 1 ? "s" : ""} Trip
-                        </CardTitle>
-                        <CardDescription>
-                          {tripPlan.numberOfDays} days • {tripPlan.numberOfPeople} travelers
-                        </CardDescription>
-                      </div>
-                      <Badge variant={tripPlan.status === "confirmed" ? "success" : "destructive"}>
-                        {tripPlan.status.charAt(0).toUpperCase() + tripPlan.status.slice(1)}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-5 w-5 text-muted-foreground" />
-                      <span>
-                        {format(new Date(tripPlan.startDate), "PPP")} - {format(new Date(tripPlan.endDate), "PPP")}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      {getTravelIcon(tripPlan.transportType)}
-                      <span>
-                        Travel by {tripPlan.transportType.charAt(0).toUpperCase() + tripPlan.transportType.slice(1)}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Hotel className="h-5 w-5 text-muted-foreground" />
-                      <span>
-                        {tripPlan.travelStyle === "base-hotel" 
-                          ? "Base hotel stay" 
-                          : "Multiple hotel stays"}
-                        {tripPlan.sleepTransport && " • Some nights in transport"}
-                      </span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <CreditCard className="h-5 w-5 text-muted-foreground" />
-                      <span>
-                        Total Cost: ₹{tripPlan.totalCost.toLocaleString()}
-                      </span>
-                    </div>
-                    
-                    {tripPlan.isPremium && (
-                      <div className="mt-2">
-                        <Badge variant="premium">Premium Trip</Badge>
-                      </div>
-                    )}
-                  </CardContent>
-                  {tripPlan.status === "confirmed" && (
-                    <CardFooter>
-                      <Button variant="destructive" onClick={handleCancel}>
-                        Cancel Trip
-                      </Button>
-                    </CardFooter>
-                  )}
-                </Card>
-
-                {renderDestinationDetails()}
-                {renderPhotoGallery()}
-
-                {tripPlan.itinerary && tripPlan.itinerary.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Trip Itinerary</CardTitle>
-                      <CardDescription>
-                        Day-by-day plan for your journey
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <TripItinerary 
-                        itinerary={tripPlan.itinerary} 
-                        transportType={tripPlan.transportType || 'car'}
-                        isPremium={!!tripPlan.isPremium}
-                      />
-                    </CardContent>
-                  </Card>
-                )}
-              </>
-            )}
-          </div>
-          
-          <div className="w-full md:w-1/3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Need Help?</CardTitle>
+                <CardTitle>Booking Information</CardTitle>
+                <CardDescription>
+                  Booking ID: {booking.id}
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  If you need assistance with your booking, please contact our customer support.
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Email:</span>
-                  <span className="text-sm">support@travelbooking.com</span>
+                <div className="flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-gray-500" />
+                  <div>
+                    <h3 className="font-medium">{destination.name}</h3>
+                    <p className="text-sm text-gray-500">{destination.city}, {destination.state}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Phone:</span>
-                  <span className="text-sm">+91 9876543210</span>
+
+                <div className="flex items-center">
+                  <Calendar className="h-5 w-5 mr-2 text-gray-500" />
+                  <div>
+                    <h3 className="font-medium">Visit Date</h3>
+                    <p className="text-sm text-gray-500">
+                      {formatDate(booking.startDate)}
+                      {booking.endDate && booking.endDate !== booking.startDate && 
+                        ` - ${formatDate(booking.endDate)}`}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <Users className="h-5 w-5 mr-2 text-gray-500" />
+                  <div>
+                    <h3 className="font-medium">Number of Visitors</h3>
+                    <p className="text-sm text-gray-500">{booking.numberOfTravelers} people</p>
+                  </div>
+                </div>
+
+                {booking.timeSlot && (
+                  <div className="flex items-center">
+                    <Clock className="h-5 w-5 mr-2 text-gray-500" />
+                    <div>
+                      <h3 className="font-medium">Time Slot</h3>
+                      <p className="text-sm text-gray-500">{booking.timeSlot}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center">
+                  <CreditCard className="h-5 w-5 mr-2 text-gray-500" />
+                  <div>
+                    <h3 className="font-medium">Payment</h3>
+                    <p className="text-sm text-gray-500">
+                      Total Amount: {formatPrice(booking.totalPrice || booking.totalAmount || 0)}
+                    </p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-2 text-gray-500" />
+                  <div>
+                    <h3 className="font-medium">Booking Status</h3>
+                    <Badge variant={booking.status === 'confirmed' ? 'default' : 'destructive'}>
+                      {booking.status || 'Confirmed'}
+                    </Badge>
+                  </div>
+                </div>
+
+                {tripPlan && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="font-medium mb-2">Part of Trip Plan</h3>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => navigate(`/trip-plans/${tripPlan.id}`)}
+                      >
+                        View Full Trip Plan
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+              <CardFooter>
+                {booking.status !== 'cancelled' && (
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => setShowCancelDialog(true)}
+                  >
+                    Cancel Booking
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
+          </div>
+
+          <div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Destination</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="relative h-48">
+                  <img 
+                    src={destination.images?.[0] || destination.image} 
+                    alt={destination.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{destination.name}</h3>
+                  <p className="text-sm text-gray-500 mb-2">
+                    {destination.description.substring(0, 100)}...
+                  </p>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {destination.tags && destination.tags.map((tag: string, index: number) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Booking</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel this booking? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+              Keep Booking
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={handleCancelBooking}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Cancelling...' : 'Yes, Cancel Booking'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
