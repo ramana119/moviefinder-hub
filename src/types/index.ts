@@ -1,3 +1,4 @@
+
 // src/types/index.ts
 export interface Destination {
   id: string;
@@ -13,6 +14,11 @@ export interface Destination {
   };
   attractions?: string[];
   photography?: boolean;
+  crowdData?: CrowdData;
+  image?: string;
+  images: string[];
+  price?: number;
+  tags?: string[];
 }
 
 export interface HotelType {
@@ -21,14 +27,43 @@ export interface HotelType {
   destinationId: string;
   type: 'budget' | 'standard' | 'luxury';
   pricePerNight: number;
+  pricePerPerson: number;
   rating: number;
   imageUrl: string;
+  amenities: string[];
+  location?: {
+    coordinates: {
+      lat: number;
+      lng: number;
+    };
+    address: string;
+    distanceFromCenter: number;
+    proximityScore: number;
+  };
+  checkInTime?: string;
+  checkOutTime?: string;
+  contact?: string;
 }
 
 export interface TransportType {
   id: string;
+  name?: string;
   type: 'bus' | 'train' | 'flight' | 'car';
   pricePerPerson: number;
+  travelTime?: number;
+  amenities: string[];
+  busClass?: string;
+  seatType?: string;
+  class?: string;
+  berthOption?: string;
+  cabinClass?: string;
+  baggageAllowance?: string;
+  carType?: string;
+  transmission?: string;
+  operator?: string;
+  airline?: string;
+  rentalCompany?: string;
+  estimatedDuration?: string;
 }
 
 export interface GuideType {
@@ -38,19 +73,26 @@ export interface GuideType {
   pricePerDay: number;
   languages: string[];
   imageUrl: string;
+  rating: number;
+  experience?: number;
 }
 
 export interface Booking {
   id: string;
   userId: string;
   destinationId: string;
-  checkIn: string;
-  timeSlot: string;
-  visitors: number;
-  totalAmount: number;
-  ticketType: string;
-  status: 'confirmed' | 'cancelled';
+  checkIn?: string;
+  timeSlot?: string;
+  visitors?: number;
+  totalAmount?: number;
+  ticketType?: string;
+  status?: 'confirmed' | 'cancelled';
   createdAt: string;
+  tripPlanId?: string;
+  numberOfTravelers: number;
+  startDate: string;
+  endDate: string;
+  totalPrice: number;
 }
 
 export interface TripPlan {
@@ -58,21 +100,23 @@ export interface TripPlan {
   userId: string;
   selectedDestinations: string[];
   startDate: string;
-  endDate: string;
+  endDate?: string;
   numberOfDays: number;
   numberOfPeople: number;
-  hotelType: 'budget' | 'standard' | 'luxury';
+  hotelType?: 'budget' | 'standard' | 'luxury';
   selectedTransport?: string;
   transportType: 'bus' | 'train' | 'flight' | 'car';
-  guideIds: string[];
-  totalCost: number;
-  status: 'planning' | 'confirmed' | 'cancelled';
+  guideIds?: string[];
+  totalCost?: number;
+  status?: 'planning' | 'confirmed' | 'cancelled';
   createdAt: string;
   isPremium?: boolean;
   sleepTransport?: boolean;
   travelStyle?: 'base-hotel' | 'mobile';
   photos?: string[];
   itinerary?: TripItineraryDay[];
+  selectedHotels?: string[];
+  hotelProximityScore?: number;
 }
 
 export interface TripItineraryDay {
@@ -93,16 +137,15 @@ export interface TripItineraryDay {
     time: string;
     location: string;
   }[];
-  detailedSchedule?: {
+  detailedSchedule: {
     time: string;
     activity: string;
-    location?: string;
+    location: string;
     notes?: string;
   }[];
-  hotels?: string[];
+  hotels: string[];
 }
 
-// Update or add the AuthContextType with withdrawPremium method
 export type AuthContextType = {
   currentUser: User | null;
   login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
@@ -117,14 +160,13 @@ export type AuthContextType = {
   error: string | null;
 };
 
-// Add withdrawal-related fields to User type if they don't exist:
 export interface User {
   id: string;
-  name: string;
+  name?: string;
   email: string;
-  password: string;
-  bookings: string[];
-  profileComplete: boolean;
+  password?: string;
+  bookings?: string[];
+  profileComplete?: boolean;
   isPremium?: boolean;
   premiumPurchaseDate?: string;
   refundPercentage?: number;
@@ -136,4 +178,128 @@ export interface User {
     preferredDestinations?: string[];
     travelFrequency?: string;
   };
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
+}
+
+export type CrowdLevel = 'low' | 'medium' | 'high';
+
+export interface CrowdData {
+  [time: string]: number;
+}
+
+export interface DestinationFilters {
+  crowdLevel: CrowdLevel | null;
+  state: string | null;
+  minPrice: number;
+  maxPrice: number;
+}
+
+export interface DestinationContextType {
+  destinations: Destination[];
+  loading: boolean;
+  error: string | null;
+  getDestinationById: (id: string) => Destination | undefined;
+  getCurrentCrowdLevel: (crowdData?: CrowdData) => CrowdLevel;
+  getBestTimeToVisit: (crowdData?: CrowdData) => string;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+  filters?: DestinationFilters;
+  setFilters?: (filters: Partial<DestinationFilters>) => void;
+  clearFilters?: () => void;
+}
+
+export interface BookingContextType {
+  bookings: Booking[];
+  loading: boolean;
+  error: string | null;
+  bookTrip: (bookingData: Omit<Booking, 'id' | 'createdAt'>) => Promise<string>;
+  getBookingsByUserId: (userId: string) => Booking[];
+  getBookingById: (id: string) => Booking | undefined;
+  cancelBooking: (bookingId: string) => Promise<void>;
+  saveTripPlan: (tripPlan: TripPlan) => Promise<void>;
+}
+
+export interface TripPlanningContextType {
+  hotels: HotelType[];
+  transports: TransportType[];
+  guides: GuideType[];
+  tripPlans: TripPlan[];
+  loading: boolean;
+  error: string | null;
+  getHotelsByDestination: (destinationId: string) => HotelType[];
+  getGuidesByDestination: (destinationId: string) => GuideType[];
+  calculateTripCost: (options: {
+    destinationIds: string[];
+    guideIds: string[];
+    hotelType: 'budget' | 'standard' | 'luxury';
+    transportType: 'bus' | 'train' | 'flight' | 'car';
+    numberOfDays: number;
+    numberOfPeople: number;
+  }) => {
+    destinationsCost: number;
+    hotelsCost: number;
+    transportCost: number;
+    guidesCost: number;
+    totalCost: number;
+  };
+  saveTripPlan: (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>) => Promise<string>;
+  getUserTripPlans: (userId: string) => TripPlan[];
+  getTripPlanById: (id: string) => TripPlan | undefined;
+  cancelTripPlan: (tripPlanId: string) => Promise<void>;
+  checkTripFeasibility: (options: {
+    destinationIds: string[];
+    transportType: 'bus' | 'train' | 'flight' | 'car';
+    numberOfDays: number;
+  }) => {
+    feasible: boolean;
+    daysNeeded: number;
+    daysShort?: number;
+    breakdown: {
+      destinationId: string;
+      destinationName: string;
+      daysNeeded: number;
+      travelHoursToNext: number;
+      travelDaysToNext: number;
+    }[];
+    totalDistance: number;
+    totalTravelHours: number;
+  };
+  generateOptimalItinerary: (options: {
+    destinationIds: string[];
+    transportType: 'bus' | 'train' | 'flight' | 'car';
+    numberOfDays: number;
+    startDate: Date;
+    travelStyle?: 'base-hotel' | 'mobile';
+    isPremium?: boolean;
+  }) => TripItineraryDay[];
+  calculateDistanceBetweenDestinations: (from: Destination, to: Destination) => number;
+  getDistanceMatrix: (destinationIds: string[]) => {
+    fromId: string;
+    toId: string;
+    fromName: string;
+    toName: string;
+    distanceKm: number;
+    travelTimesByTransport: {
+      bus: number;
+      train: number;
+      flight: number;
+      car: number;
+    };
+  }[];
+  getSuggestedTransport: (destinationIds: string[], numberOfDays: number, isPremium?: boolean) => {
+    recommendedType: 'bus' | 'train' | 'flight' | 'car';
+    alternativeType: 'train' | 'car';
+    reasoning: string;
+    totalDistanceKm: number;
+    totalTravelTimeHours: number;
+    timeForSightseeing: number;
+    isRealistic: boolean;
+    premiumAdvantages?: string[];
+  };
+  getTransportAmenities: (type: string, isOvernight: boolean) => string[];
+  getOptimalHotels: (destinationIds: string[]) => HotelType[];
+  getNearbyHotels: (destinationId: string, limit?: number) => HotelType[];
+  calculateHotelProximity: (hotel: HotelType, destination: Destination) => HotelType;
 }

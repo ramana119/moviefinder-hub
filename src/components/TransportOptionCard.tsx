@@ -4,6 +4,8 @@ import { Bus, Train, Plane, Car, Clock } from 'lucide-react';
 import { TransportType } from '../types';
 
 interface ExtendedTransportType extends TransportType {
+  name?: string;
+  travelTime?: number;
   busClass?: string;
   seatType?: string;
   class?: string;
@@ -130,7 +132,7 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({
 
   // Simplified amenities rendering from string array
   const renderAmenityIcons = () => {
-    return transport.amenities && transport.amenities.length > 0 ? transport.amenities.map((amenity, index) => (
+    return transport.amenities?.length > 0 ? transport.amenities.map((amenity, index) => (
       <span key={index} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
         {amenity}
       </span>
