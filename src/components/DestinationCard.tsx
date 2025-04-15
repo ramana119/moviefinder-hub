@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Destination } from '../types';
@@ -5,7 +6,7 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { formatPrice, getCrowdLevelBgClass } from '../utils/helpers';
+import { formatPrice, getBasePrice, getCrowdLevelBgClass } from '../utils/helpers';
 import { useDestinations } from '../context/DestinationContext';
 import { MapPin, Users, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -46,7 +47,7 @@ const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
         <Card className="h-full overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col">
           <div className="relative h-48 overflow-hidden">
             <img
-              src={destination.images[0] || destination.image}
+              src={destination.images[0] || ''}
               alt={destination.name}
               className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
               loading="lazy"

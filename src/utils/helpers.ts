@@ -1,22 +1,28 @@
-
 import { CrowdLevel } from '../types';
 
 // Format price to currency
-export const formatPrice = (price: number) => {
+export const formatPrice = (price: number | { adult: number; child: number; foreigner?: number; includes?: string[] }): string => {
+  // For complex price objects, use the adult price
+  const numericPrice = typeof price === 'number' ? price : price.adult;
+  
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
     maximumFractionDigits: 0
-  }).format(price);
+  }).format(numericPrice);
 };
 
 // Get CSS class based on crowd level
-export const getCrowdLevelBgClass = (level: CrowdLevel) => {
+export const getCrowdLevelBgClass = (level: string): string => {
   switch(level) {
-    case 'low': return 'bg-green-100 text-green-800';
-    case 'medium': return 'bg-yellow-100 text-yellow-800';
-    case 'high': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
+    case 'low':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'high':
+      return 'bg-red-100 text-red-800 border-red-200';
+    default:
+      return 'bg-blue-100 text-blue-800 border-blue-200';
   }
 };
 
@@ -80,4 +86,9 @@ export const isValidEmail = (email: string): boolean => {
 // Password validation
 export const isValidPassword = (password: string): boolean => {
   return password.length >= 8;
+};
+
+// Get the base price from either a number or price object
+export const getBasePrice = (price: number | { adult: number; child: number; foreigner?: number; includes?: string[] }): number => {
+  return typeof price === 'number' ? price : price.adult;
 };

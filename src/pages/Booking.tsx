@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { formatPrice } from '../utils/helpers';
+import { formatPrice, getBasePrice } from '../utils/helpers';
 import { Loader2, Calendar as CalendarIcon, Users, Clock, Star } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
@@ -41,12 +41,11 @@ const Booking: React.FC = () => {
   ];
 
   const ticketPrices = {
-    standard: destination?.price || 0,
-    premium: (destination?.price || 0) * 1.5,
-    guided: isPremium ? 0 : (destination?.price || 0) * 2
+    standard: destination ? getBasePrice(destination.price || 0) : 0,
+    premium: destination ? getBasePrice(destination.price || 0) * 1.5 : 0,
+    guided: isPremium ? 0 : (destination ? getBasePrice(destination.price || 0) * 2 : 0)
   };
   
-  // Get the best time to visit and current crowd level
   const bestTimeToVisit = destination ? getBestTimeToVisit(destination.crowdData) : '';
   const crowdLevel = destination ? getCurrentCrowdLevel(destination.crowdData) : 'low';
 
@@ -56,7 +55,6 @@ const Booking: React.FC = () => {
     const basePrice = ticketPrices[ticketType as keyof typeof ticketPrices];
     const visitorPrice = basePrice * visitors;
     
-    // Add weekend surcharge if applicable
     const isWeekend = date && (date.getDay() === 0 || date.getDay() === 6);
     const weekendMultiplier = isWeekend ? 1.2 : 1;
     
@@ -104,7 +102,6 @@ const Booking: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Booking form */}
           <div className="md:col-span-2">
             <Card>
               <CardHeader>
@@ -211,7 +208,6 @@ const Booking: React.FC = () => {
             </Card>
           </div>
 
-          {/* Summary */}
           <div className="md:col-span-1">
             <Card>
               <CardHeader>
@@ -274,7 +270,6 @@ const Booking: React.FC = () => {
               </CardFooter>
             </Card>
             
-            {/* Best time to visit */}
             <Card className="mt-4">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center justify-between">

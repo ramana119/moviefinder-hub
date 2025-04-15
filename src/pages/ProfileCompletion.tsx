@@ -20,11 +20,12 @@ const ProfileCompletion: React.FC = () => {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [address, setAddress] = useState<string>('');
-  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
   const [dob, setDob] = useState<Date | undefined>(undefined);
   const [selectedDestinations, setSelectedDestinations] = useState<string[]>([]);
   const [travelFrequency, setTravelFrequency] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const { toast } = useToast();
 
   const destinationOptions = [
@@ -40,42 +41,40 @@ const ProfileCompletion: React.FC = () => {
     { value: 'yearly', label: 'Yearly' }
   ];
 
-  // Fix the phoneNumber property in the form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!firstName || !lastName) return;
+    setIsSubmitting(true);
+    setError('');
 
     try {
-      setIsSubmitting(true);
-      
-      // Update profile data structure to match the expected type
-      const profileData = {
-        address: address,
-        phone: phoneNumber,  // Correctly use phone instead of phoneNumber
-        dob: dob ? dob.toISOString() : undefined,
-        preferredDestinations: selectedDestinations,
-        travelFrequency: travelFrequency
-      };
-      
+      if (!firstName.trim() || !lastName.trim()) {
+        throw new Error('Please provide both first and last name');
+      }
+
+      if (!phone.trim()) {
+        throw new Error('Please provide a phone number');
+      }
+
+      if (!dob.trim()) {
+        throw new Error('Please provide your date of birth');
+      }
+
       await completeProfile({
-        firstName,
-        lastName
+        address,
+        phone,
+        dob,
+        preferredDestinations,
+        travelFrequency
       });
-      
+
       toast({
-        title: "Profile Completed",
-        description: "Your profile has been successfully updated.",
+        title: "Profile completed!",
+        description: "You can now enjoy all features of the app.",
       });
-      
-      navigate('/');
-    } catch (error) {
-      console.error('Profile completion error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to complete your profile. Please try again.",
-        variant: "destructive"
-      });
+
+      navigate('/destinations');
+    } catch (err) {
+      setError((err as Error).message || 'Something went wrong');
     } finally {
       setIsSubmitting(false);
     }
@@ -125,12 +124,12 @@ const ProfileCompletion: React.FC = () => {
           </div>
           
           <div>
-            <Label htmlFor="phoneNumber">Phone Number</Label>
+            <Label htmlFor="phone">Phone Number</Label>
             <Input
-              id="phoneNumber"
+              id="phone"
               type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
             />
           </div>
           

@@ -1,3 +1,4 @@
+
 // src/types/index.ts
 export interface Destination {
   id: string;
@@ -24,6 +25,7 @@ export interface Destination {
   };
   tags?: string[];
   openingHours?: string;
+  bestTimeToVisit?: string;
 }
 
 export interface HotelType {
@@ -31,10 +33,11 @@ export interface HotelType {
   name: string;
   destinationId: string;
   type: 'budget' | 'standard' | 'luxury';
-  pricePerNight: number;
+  pricePerNight?: number;
   pricePerPerson: number;
   rating: number;
-  imageUrl: string;
+  imageUrl?: string;
+  image?: string;
   amenities: string[];
   location?: {
     coordinates: {
@@ -154,6 +157,7 @@ export interface TripItineraryDay {
 
 export type AuthContextType = {
   currentUser: User | null;
+  user: User | null;
   login: (email: string, password: string, rememberMe: boolean) => Promise<void>;
   signup: (userData: Omit<User, 'id' | 'bookings' | 'profileComplete'>) => Promise<void>;
   logout: () => void;
@@ -180,6 +184,7 @@ export interface User {
   profileData?: {
     address?: string;
     phone?: string;
+    phoneNumber?: string;
     dob?: string;
     preferredDestinations?: string[];
     travelFrequency?: string;

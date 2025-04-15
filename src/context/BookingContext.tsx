@@ -138,6 +138,70 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [bookings, toast]);
 
+  // Get user bookings (alias for getBookingsByUserId for compatibility)
+  const getUserBookings = useCallback((userId: string): Booking[] => {
+    return getBookingsByUserId(userId);
+  }, [getBookingsByUserId]);
+
+  // Get user trip plans
+  const getUserTripPlans = useCallback((userId: string): TripPlan[] => {
+    // Find all bookings with tripPlanId
+    const userBookingsWithTripPlan = bookings.filter(
+      booking => booking.userId === userId && booking.tripPlanId
+    );
+    
+    // Load trip plans from localStorage
+    return userBookingsWithTripPlan.map(booking => {
+      const tripPlanKey = `trip_plan_${booking.tripPlanId}`;
+      const tripPlanJson = localStorage.getItem(tripPlanKey);
+      return tripPlanJson ? JSON.parse(tripPlanJson) : null;
+    }).filter(Boolean) as TripPlan[];
+  }, [bookings]);
+
+  // Add booking (for direct booking without trip plan)
+  const addBooking = useCallback(async (bookingData: any): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const newBooking: Booking = {
+        ...bookingData,
+        id: `booking_${uuidv4()}`,
+        createdAt: new Date().toISOString(),
+        numberOfTravelers: bookingData.visitors || 1,
+        startDate: bookingData.checkIn || new Date().toISOString(),
+        endDate: bookingData.checkIn || new Date().toISOString(),
+        totalPrice: bookingData.totalAmount || 0
+      };
+
+      // Save to state
+      setBookings(prev => [...prev, newBooking]);
+
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Success toast
+      toast({
+        title: "Booking Confirmed!",
+        description: `Your booking has been confirmed successfully.`,
+      });
+    } catch (err) {
+      const errorMessage = (err as Error).message || 'Failed to add booking';
+      setError(errorMessage);
+      
+      // Error toast
+      toast({
+        title: "Booking Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
   // Save trip plan as a booking record
   const saveTripPlan = useCallback(async (tripPlan: TripPlan): Promise<void> => {
     setLoading(true);
@@ -195,6 +259,9 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
         getBookingById,
         cancelBooking,
         saveTripPlan,
+        addBooking,
+        getUserBookings,
+        getUserTripPlans,
       }}
     >
       {children}
