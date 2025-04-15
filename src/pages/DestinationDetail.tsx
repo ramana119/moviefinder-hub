@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDestinations } from '../context/DestinationContext';
+import type { Destination } from '../types';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
