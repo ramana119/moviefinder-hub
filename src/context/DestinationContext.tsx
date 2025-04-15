@@ -26,7 +26,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     minPrice: 0,
     maxPrice: 5000
   });
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
   // Simulate fetching destinations
   useEffect(() => {
@@ -87,7 +87,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       
       return true;
     });
-  }, [searchQuery, filters, destinations]);
+  }, [searchQuery, filters]);
 
   // Get destination by ID
   const getDestinationById = (id: string): Destination | undefined => {
@@ -96,9 +96,9 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Check if a user has booking for a destination
   const hasBooking = (destinationId: string): boolean => {
-    if (!currentUser || !currentUser.bookings) return false;
+    if (!user || !user.bookings) return false;
     
-    return currentUser.bookings.some(bookingId => {
+    return user.bookings.some(bookingId => {
       const booking = localStorage.getItem(`booking_${bookingId}`);
       if (booking) {
         const parsedBooking = JSON.parse(booking);
@@ -110,7 +110,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   // Check if a destination is accessible to the user
   const canAccessDestination = (destinationId: string): boolean => {
-    return currentUser?.isPremium || hasBooking(destinationId);
+    return user?.isPremium || hasBooking(destinationId);
   };
 
   // Clear all filters
@@ -122,6 +122,14 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
       maxPrice: 5000
     });
     setSearchQuery('');
+  };
+
+  // Function to set filters that accepts partial updates
+  const handleSetFilters = (updatedFilters: Partial<DestinationFilters>) => {
+    setFilters(prev => ({
+      ...prev,
+      ...updatedFilters
+    }));
   };
 
   return (
@@ -136,7 +144,7 @@ export const DestinationProvider: React.FC<{ children: React.ReactNode }> = ({ c
         searchQuery,
         setSearchQuery,
         filters,
-        setFilters,
+        setFilters: handleSetFilters,
         clearFilters
       }}
     >

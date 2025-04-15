@@ -1,3 +1,4 @@
+
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
@@ -42,6 +43,7 @@ export interface LoginData {
 export interface SignupData {
   email: string;
   password?: string;
+  fullName?: string;
 }
 
 export interface ProfileData {
@@ -108,6 +110,7 @@ export interface HotelType {
     address: string;
     distanceFromCenter: number;
     proximityScore: number;
+    nearbyAttractions?: string[];
   };
   checkInTime?: string;
   checkOutTime?: string;
@@ -123,7 +126,7 @@ export interface TransportType {
   pricePerPerson: number;
   travelTime: number;
   amenities: string[];
-  transportClass?: BusType | TrainType | FlightType | CarType;
+  transportClass: BusType | TrainType | FlightType | CarType;
   operator?: string;
   departureTime?: string;
   arrivalTime?: string;
@@ -149,6 +152,7 @@ export interface GuideType {
     comment: string;
     userId: string;
   }[];
+  image?: string; // For backward compatibility
 }
 
 export interface Destination {

@@ -70,3 +70,14 @@ export const getInitials = (name: string): string => {
     .join('')
     .toUpperCase();
 };
+
+// Email validation
+export const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Password validation
+export const isValidPassword = (password: string): boolean => {
+  return password.length >= 8;
+};

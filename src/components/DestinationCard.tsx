@@ -1,98 +1,122 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Users } from 'lucide-react';
-import { Destination, CrowdLevel } from '../types';
+import { Destination } from '../types';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { formatPrice, getCrowdLevelBgClass } from '../utils/helpers';
 import { useDestinations } from '../context/DestinationContext';
+import { MapPin, Users, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface DestinationCardProps {
   destination: Destination;
 }
 
-// Function to get crowd level background class
-const getCrowdLevelBgClass = (level: CrowdLevel) => {
-  switch(level) {
-    case 'low': return 'bg-green-100 text-green-800';
-    case 'medium': return 'bg-yellow-100 text-yellow-800';
-    case 'high': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-};
-
 const DestinationCard: React.FC<DestinationCardProps> = ({ destination }) => {
   const { getCurrentCrowdLevel, getBestTimeToVisit } = useDestinations();
-  const crowdLevel = getCurrentCrowdLevel?.(destination.crowdData) || 'medium';
-  const bestTimeToVisit = getBestTimeToVisit?.(destination.crowdData) || 'Any time';
+  const currentCrowdLevel = getCurrentCrowdLevel && destination.crowdData ? getCurrentCrowdLevel(destination.crowdData) : 'medium';
+  const bestTimeToVisit = getBestTimeToVisit && destination.crowdData ? getBestTimeToVisit(destination.crowdData) : 'Any time';
   
-  const crowdLevelText = {
-    low: 'Low Crowd',
-    medium: 'Moderate Crowd',
-    high: 'High Crowd',
+  const crowdLevelClass = getCrowdLevelBgClass(currentCrowdLevel);
+  
+  const cardStyles = {
+    transform: 'translateY(0px)',
+    transition: 'transform 0.3s ease-in-out',
   };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-IN', {
-      style: 'currency',
-      currency: 'INR',
-      maximumFractionDigits: 0
-    }).format(price);
+  
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    card.style.transform = 'translateY(-8px)';
   };
-
-  const getStartingPrice = () => {
-    return `From ${formatPrice(destination.price || 0)}`;
+  
+  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    card.style.transform = 'translateY(0px)';
   };
 
   return (
-    <Link to={`/destinations/${destination.id}`} className="block hover:shadow-lg transition-shadow">
-      <Card className="h-full border rounded-lg overflow-hidden">
-        <div className="relative aspect-video">
-          <img
-            src={destination.images?.[0] || destination.image || '/placeholder-image.jpg'}
-            alt={destination.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
-          <Badge 
-            className={`absolute top-3 right-3 ${getCrowdLevelBgClass(crowdLevel)}`}
-          >
-            <Users className="w-3 h-3 mr-1" />
-            {crowdLevelText[crowdLevel]}
-          </Badge>
-        </div>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-start gap-2">
-            <h3 className="font-semibold text-lg leading-tight">{destination.name}</h3>
-            <div className="flex items-center shrink-0">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="ml-1 text-sm">{destination.rating || 4.5}</span>
+    <Link to={`/destinations/${destination.id}`} className="block">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Card 
+          className="overflow-hidden border-2 hover:border-primary transition-all duration-300"
+          style={cardStyles}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="relative">
+            <AspectRatio ratio={16 / 9}>
+              <img 
+                src={destination.images[0]} 
+                alt={destination.name} 
+                className="w-full h-full object-cover"
+              />
+            </AspectRatio>
+            
+            <div className="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/70 to-transparent text-white">
+              <h3 className="text-xl font-semibold truncate">{destination.name}</h3>
+              
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{destination.city}, {destination.state}</span>
+                </div>
+                
+                {destination.rating && (
+                  <div className="flex items-center bg-yellow-400/90 text-gray-900 px-1.5 py-0.5 rounded text-xs font-medium">
+                    <Star className="h-3 w-3 mr-0.5 fill-current" />
+                    {destination.rating}
+                  </div>
+                )}
+              </div>
             </div>
+            
+            <Badge 
+              className={`absolute top-2 right-2 ${crowdLevelClass}`}
+              variant="outline"
+            >
+              {currentCrowdLevel === 'low' ? 'Low crowds' : 
+               currentCrowdLevel === 'medium' ? 'Moderate crowds' : 
+               'High crowds'}
+            </Badge>
           </div>
           
-          <div className="flex items-center mt-1 text-muted-foreground text-sm">
-            <MapPin className="w-3 h-3 mr-1" />
-            <span className="truncate">{destination.city || 'Unknown'}, {destination.state || 'Location'}</span>
-          </div>
-          
-          <p className="mt-2 text-sm line-clamp-2 text-muted-foreground">
-            {destination.description}
-          </p>
-          
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <p className="text-xs text-muted-foreground">Best time</p>
-              <p className="font-medium text-sm">{bestTimeToVisit}</p>
+          <CardContent className="p-4">
+            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+              {destination.description}
+            </p>
+            
+            <div className="flex flex-wrap gap-1 mb-2">
+              {destination.tags && destination.tags.slice(0, 3).map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
             </div>
-            <div className="text-right">
-              <p className="text-xs text-muted-foreground">Entry</p>
-              <p className="font-semibold text-primary">
-                {getStartingPrice()}
-              </p>
+            
+            <div className="text-sm border-t pt-2">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Best time to visit:</span>
+                <span className="font-medium">{bestTimeToVisit}</span>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+          
+          <CardFooter className="border-t bg-muted/30 p-4 flex justify-between items-center">
+            <div className="font-bold text-lg">
+              {formatPrice(destination.price || 0)}
+            </div>
+            
+            <Button size="sm">View Details</Button>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </Link>
   );
 };
