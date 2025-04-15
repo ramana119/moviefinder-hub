@@ -1,285 +1,200 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+// Import updated types
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { Booking, BookingContextType, TripPlan } from '../types';
-import { useToast } from '@/hooks/use-toast';
+import { 
+  Booking, 
+  BookingContextType, 
+  TripPlan
+} from '../types';
+import { useToast } from '../hooks/use-toast';
 
+// Create the BookingContext
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
+// BookingProvider component
 export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [bookings, setBookings] = useState<Booking[]>([]);
-  const [tripPlans, setTripPlans] = useState<TripPlan[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   // Initialize bookings from localStorage
-  useEffect(() => {
+  React.useEffect(() => {
     try {
-      const storedBookings = localStorage.getItem('bookings');
+      const storedBookings = window.localStorage.getItem('bookings');
       if (storedBookings) {
         setBookings(JSON.parse(storedBookings));
-      } else {
-        localStorage.setItem('bookings', JSON.stringify([]));
       }
-      
-      // Also load trip plans
-      const storedTripPlans = localStorage.getItem('tripPlans');
-      if (storedTripPlans) {
-        setTripPlans(JSON.parse(storedTripPlans));
-      } else {
-        localStorage.setItem('tripPlans', JSON.stringify([]));
-      }
-    } catch (err) {
-      console.error('Error initializing bookings:', err);
-      setError('Failed to load bookings');
-      toast({
-        title: 'Error',
-        description: 'Failed to load your bookings.',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Failed to load bookings from localStorage', error);
     }
   }, []);
 
-  // Save bookings to localStorage whenever they change
-  useEffect(() => {
-    if (bookings.length > 0 || !loading) {
-      localStorage.setItem('bookings', JSON.stringify(bookings));
+  // Save bookings to localStorage when they change
+  React.useEffect(() => {
+    if (bookings.length > 0) {
+      window.localStorage.setItem('bookings', JSON.stringify(bookings));
     }
   }, [bookings]);
 
-  // Save trip plans to localStorage whenever they change
-  useEffect(() => {
-    if (tripPlans.length > 0 || !loading) {
-      localStorage.setItem('tripPlans', JSON.stringify(tripPlans));
-    }
-  }, [tripPlans]);
-
-  const addBooking = async (bookingData: Omit<Booking, 'id' | 'createdAt'>): Promise<string> => {
-    setError(null);
+  // Book a trip
+  const bookTrip = useCallback(async (bookingData: Omit<Booking, 'id' | 'createdAt'>): Promise<string> => {
     setLoading(true);
+    setError(null);
 
     try {
-      // Simulate network request
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Generate a new booking ID
-      const newBookingId = `booking_${uuidv4()}`;
-
-      // Create new booking
       const newBooking: Booking = {
         ...bookingData,
-        id: newBookingId,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Add to bookings array
-      setBookings((prev) => [...prev, newBooking]);
-
-      // Add booking to user's bookings array
-      try {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userIndex = users.findIndex((u: any) => u.id === bookingData.userId);
-        
-        if (userIndex !== -1) {
-          users[userIndex].bookings.push(newBookingId);
-          localStorage.setItem('users', JSON.stringify(users));
-          
-          // Update current user if this is their booking
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-          if (currentUser && currentUser.id === bookingData.userId) {
-            currentUser.bookings.push(newBookingId);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          }
-        }
-      } catch (err) {
-        console.error('Error updating user bookings:', err);
-      }
-
-      toast({
-        title: 'Booking Confirmed!',
-        description: 'Your booking has been successfully created.',
-      });
-
-      return newBookingId;
-    } catch (err) {
-      const errorMsg = (err as Error).message || 'Failed to create booking';
-      setError(errorMsg);
-      toast({
-        title: 'Booking Failed',
-        description: errorMsg,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const saveTripPlan = async (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>): Promise<string> => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      // Simulate network request
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Generate a new trip plan ID
-      const newTripPlanId = `trip_${uuidv4()}`;
-
-      // Create new trip plan
-      const newTripPlan: TripPlan = {
-        ...tripPlanData,
-        id: newTripPlanId,
-        createdAt: new Date().toISOString(),
-      };
-
-      // Add to trip plans array
-      setTripPlans((prev) => [...prev, newTripPlan]);
-
-      // Also create a regular booking entry so it appears in the user's bookings
-      const bookingData = {
         id: `booking_${uuidv4()}`,
-        userId: tripPlanData.userId,
-        destinationId: tripPlanData.selectedDestinations[0], // Use the first destination for the booking
-        checkIn: tripPlanData.startDate,
-        timeSlot: '09:00 AM', // Default time
-        visitors: tripPlanData.numberOfPeople,
-        ticketType: 'standard',
-        totalAmount: tripPlanData.totalCost,
-        status: 'confirmed' as const,
         createdAt: new Date().toISOString(),
-        tripPlanId: newTripPlanId, // Link to the trip plan
       };
 
-      // Add to bookings array
-      setBookings((prev) => [...prev, bookingData]);
+      // Save to state
+      setBookings(prev => [...prev, newBooking]);
 
-      // Update user's bookings array
-      try {
-        const users = JSON.parse(localStorage.getItem('users') || '[]');
-        const userIndex = users.findIndex((u: any) => u.id === tripPlanData.userId);
-        
-        if (userIndex !== -1) {
-          users[userIndex].bookings.push(bookingData.id);
-          localStorage.setItem('users', JSON.stringify(users));
-          
-          // Update current user if this is their booking
-          const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-          if (currentUser && currentUser.id === tripPlanData.userId) {
-            currentUser.bookings.push(bookingData.id);
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-          }
-        }
-      } catch (err) {
-        console.error('Error updating user bookings:', err);
-      }
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
 
+      // Success toast
       toast({
-        title: 'Trip Plan Confirmed!',
-        description: 'Your trip has been successfully booked.',
+        title: "Booking Confirmed!",
+        description: `Your booking for ${newBooking.numberOfTravelers} travelers has been confirmed.`,
       });
 
-      return newTripPlanId;
+      return newBooking.id;
     } catch (err) {
-      const errorMsg = (err as Error).message || 'Failed to save trip plan';
-      setError(errorMsg);
+      const errorMessage = (err as Error).message || 'Failed to book trip';
+      setError(errorMessage);
+      
+      // Error toast
       toast({
-        title: 'Trip Booking Failed',
-        description: errorMsg,
-        variant: 'destructive',
+        title: "Booking Failed",
+        description: errorMessage,
+        variant: "destructive",
       });
-      throw err;
+      
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
-  const cancelBooking = async (bookingId: string): Promise<void> => {
-    setError(null);
+  // Get bookings by user ID
+  const getBookingsByUserId = useCallback((userId: string): Booking[] => {
+    return bookings.filter(booking => booking.userId === userId);
+  }, [bookings]);
+
+  // Get booking by ID
+  const getBookingById = useCallback((id: string): Booking | undefined => {
+    return bookings.find(booking => booking.id === id);
+  }, [bookings]);
+
+  // Cancel booking
+  const cancelBooking = useCallback(async (bookingId: string): Promise<void> => {
     setLoading(true);
+    setError(null);
 
     try {
-      // Simulate network request
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Find booking index
-      const bookingIndex = bookings.findIndex((b) => b.id === bookingId);
+      const bookingIndex = bookings.findIndex(booking => booking.id === bookingId);
+      
       if (bookingIndex === -1) {
         throw new Error('Booking not found');
       }
 
-      // Calculate refund based on timing
-      const booking = bookings[bookingIndex];
-      const checkInDate = new Date(booking.checkIn);
-      const hoursLeft = (checkInDate.getTime() - Date.now()) / (1000 * 60 * 60);
-      const refundPercent = hoursLeft > 24 ? 100 : hoursLeft > 12 ? 50 : 0;
-
-      // Update booking status
+      // Create updated booking with cancelled status
       const updatedBooking: Booking = {
-        ...booking,
+        ...bookings[bookingIndex],
         status: 'cancelled',
       };
 
-      // Update bookings array
+      // Update the bookings array
       const updatedBookings = [...bookings];
       updatedBookings[bookingIndex] = updatedBooking;
       setBookings(updatedBookings);
 
-      toast({
-        title: 'Booking Cancelled',
-        description: refundPercent > 0 
-          ? `You will receive a ${refundPercent}% refund within 3-5 business days.`
-          : 'No refund is available for this cancellation.',
-      });
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-    } catch (err) {
-      const errorMsg = (err as Error).message || 'Failed to cancel booking';
-      setError(errorMsg);
+      // Success toast
       toast({
-        title: 'Error',
-        description: errorMsg,
-        variant: 'destructive',
+        title: "Booking Cancelled",
+        description: "Your booking has been cancelled successfully.",
       });
-      throw err;
+    } catch (err) {
+      const errorMessage = (err as Error).message || 'Failed to cancel booking';
+      setError(errorMessage);
+      
+      // Error toast
+      toast({
+        title: "Cancellation Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      throw new Error(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, [bookings, toast]);
 
-  const getBookingById = (bookingId: string) => {
-    return bookings.find((b) => b.id === bookingId);
-  };
+  // Save trip plan as a booking record
+  const saveTripPlan = useCallback(async (tripPlan: TripPlan): Promise<void> => {
+    setLoading(true);
+    setError(null);
 
-  const getUserBookings = (userId: string) => {
-    // Get both regular bookings and trip plans
-    const userBookings = bookings.filter((b) => b.userId === userId);
-    
-    // Get trip-related bookings
-    const userTripPlans = tripPlans.filter((t) => t.userId === userId);
-    
-    return userBookings;
-  };
+    try {
+      // Create a booking record from the trip plan
+      const bookingData: Omit<Booking, 'id' | 'createdAt'> = {
+        userId: tripPlan.userId,
+        destinationId: tripPlan.selectedDestinations[0], // Use the first destination
+        numberOfTravelers: tripPlan.numberOfPeople,
+        startDate: tripPlan.startDate,
+        endDate: tripPlan.endDate || '',
+        totalPrice: tripPlan.totalCost || 0,
+        tripPlanId: tripPlan.id,
+      };
 
-  const getUserTripPlans = (userId: string) => {
-    return tripPlans.filter((t) => t.userId === userId);
-  };
+      // Add the booking record
+      const newBookingId = await bookTrip(bookingData);
+      
+      // Store trip plan in localStorage
+      localStorage.setItem(`trip_plan_${tripPlan.id}`, JSON.stringify(tripPlan));
+      
+      // Success toast
+      toast({
+        title: "Trip Plan Saved",
+        description: "Your trip plan has been saved and booked successfully.",
+      });
+    } catch (err) {
+      const errorMessage = (err as Error).message || 'Failed to save trip plan';
+      setError(errorMessage);
+      
+      // Error toast
+      toast({
+        title: "Trip Plan Save Failed",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  }, [bookTrip, toast]);
 
+  // Provide the booking context
   return (
     <BookingContext.Provider
       value={{
         bookings,
-        tripPlans,
-        addBooking,
-        cancelBooking,
-        getBookingById,
-        getUserBookings,
-        getUserTripPlans,
-        saveTripPlan,
         loading,
         error,
+        bookTrip,
+        getBookingsByUserId,
+        getBookingById,
+        cancelBooking,
+        saveTripPlan,
       }}
     >
       {children}
@@ -287,6 +202,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 };
 
+// Custom hook to use the BookingContext
 export const useBookings = () => {
   const context = useContext(BookingContext);
   if (context === undefined) {

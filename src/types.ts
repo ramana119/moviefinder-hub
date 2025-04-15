@@ -1,3 +1,4 @@
+
 export interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
@@ -17,6 +18,22 @@ export interface User {
   lastName?: string;
   profileComplete?: boolean;
   premiumMember?: boolean;
+  // Missing properties being added
+  name?: string;
+  fullName?: string;
+  password?: string;
+  bookings?: string[];
+  isPremium?: boolean;
+  premiumPurchaseDate?: string;
+  refundPercentage?: number;
+  withdrawalDate?: string;
+  profileData?: {
+    address?: string;
+    phone?: string;
+    dob?: string;
+    preferredDestinations?: string[];
+    travelFrequency?: string;
+  };
 }
 
 export interface LoginData {
@@ -39,6 +56,14 @@ export interface DestinationContextType {
   loading: boolean;
   error: string | null;
   getDestinationById: (id: string) => Destination | undefined;
+  // Adding missing properties
+  getCurrentCrowdLevel?: (crowdData?: CrowdData) => CrowdLevel;
+  getBestTimeToVisit?: (crowdData?: CrowdData) => string;
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+  filters?: DestinationFilters;
+  setFilters?: (filters: Partial<DestinationFilters>) => void;
+  clearFilters?: () => void;
 }
 
 export interface BookingContextType {
@@ -62,6 +87,13 @@ export interface Booking {
   totalPrice: number;
   createdAt: string;
   tripPlanId?: string;
+  // Adding compatibility properties
+  checkIn?: string;
+  timeSlot?: string;
+  visitors?: number;
+  ticketType?: string;
+  totalAmount?: number;
+  status?: 'confirmed' | 'cancelled';
 }
 
 export interface HotelType {
@@ -84,6 +116,9 @@ export interface HotelType {
   checkInTime?: string;
   checkOutTime?: string;
   contact?: string;
+  // Adding compatibility properties
+  pricePerNight?: number;
+  imageUrl?: string;
 }
 
 export interface TransportType {
@@ -91,6 +126,21 @@ export interface TransportType {
   type: 'bus' | 'train' | 'flight' | 'car';
   amenities: string[];
   pricePerPerson: number;
+  // Adding compatibility properties
+  name?: string;
+  travelTime?: number;
+  busClass?: string;
+  seatType?: string;
+  class?: string;
+  berthOption?: string;
+  cabinClass?: string;
+  baggageAllowance?: string;
+  carType?: string;
+  transmission?: string;
+  operator?: string;
+  airline?: string;
+  rentalCompany?: string;
+  estimatedDuration?: string;
 }
 
 export interface GuideType {
@@ -100,6 +150,8 @@ export interface GuideType {
   languages: string[];
   pricePerDay: number;
   rating: number;
+  // Adding compatibility properties
+  imageUrl?: string;
 }
 
 export interface Destination {
@@ -114,6 +166,14 @@ export interface Destination {
   price?: number;
   attractions?: string[];
   tags?: string[];
+  // Adding compatibility properties
+  city?: string;
+  state?: string;
+  rating?: number;
+  image?: string;
+  imageUrl?: string;
+  crowdData?: CrowdData;
+  photography?: boolean;
 }
 
 export interface TripPlan {
@@ -130,6 +190,15 @@ export interface TripPlan {
   selectedHotels: string[];
   hotelProximityScore?: number;
   createdAt: string;
+  // Adding compatibility properties
+  endDate?: string;
+  hotelType?: 'budget' | 'standard' | 'luxury';
+  selectedTransport?: string;
+  guideIds?: string[];
+  totalCost?: number;
+  status?: 'planning' | 'confirmed' | 'cancelled';
+  sleepTransport?: boolean;
+  photos?: string[];
 }
 
 export interface TripPlanningContextType {
@@ -226,6 +295,34 @@ export interface TripItineraryDay {
     time: string;
     activity: string;
     location: string;
+    notes?: string;
   }[];
   hotels: string[];
+  // Adding missing properties
+  departureTime?: string;
+  arrivalTime?: string;
+  transportDetails?: {
+    vehicle: string;
+    duration: string;
+    amenities: string[];
+  };
+  freshUpStops?: {
+    time: string;
+    location: string;
+  }[];
 }
+
+// New types to fix the errors
+export type CrowdLevel = 'low' | 'medium' | 'high';
+
+export interface CrowdData {
+  [time: string]: number;
+}
+
+export interface DestinationFilters {
+  crowdLevel: CrowdLevel | null;
+  state: string | null;
+  minPrice: number;
+  maxPrice: number;
+}
+

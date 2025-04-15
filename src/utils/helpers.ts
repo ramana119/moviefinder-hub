@@ -1,8 +1,8 @@
 
-// Helper functions for the app
+import { CrowdLevel } from '../types';
 
-// Format price in INR currency format
-export const formatPrice = (price: number): string => {
+// Format price to currency
+export const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -11,77 +11,62 @@ export const formatPrice = (price: number): string => {
 };
 
 // Get CSS class based on crowd level
-export const getCrowdLevelClass = (level: string): string => {
-  switch (level) {
-    case 'low':
-      return 'text-crowd-low';
-    case 'medium':
-      return 'text-crowd-medium';
-    case 'high':
-      return 'text-crowd-high';
-    default:
-      return '';
+export const getCrowdLevelBgClass = (level: CrowdLevel) => {
+  switch(level) {
+    case 'low': return 'bg-green-100 text-green-800';
+    case 'medium': return 'bg-yellow-100 text-yellow-800';
+    case 'high': return 'bg-red-100 text-red-800';
+    default: return 'bg-gray-100 text-gray-800';
   }
 };
 
-// Get background CSS class based on crowd level
-export const getCrowdLevelBgClass = (level: string): string => {
-  switch (level) {
-    case 'low':
-      return 'bg-green-100 text-green-800';
-    case 'medium':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'high':
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
-
-// Format time from 24-hour format to 12-hour format
-export const formatTime = (time: string): string => {
-  const [hours] = time.split(':').map(Number);
+// Get best time to visit based on crowd data
+export const getBestTimeToVisit = (crowdData: Record<string, number> = {}) => {
+  if (Object.keys(crowdData).length === 0) return 'Any time';
   
-  if (hours === 0) return '12 AM';
-  if (hours === 12) return '12 PM';
+  let bestTime = '';
+  let lowestCrowd = Infinity;
   
-  return hours > 12 ? `${hours - 12} PM` : `${hours} AM`;
-};
-
-// Get today's date formatted as YYYY-MM-DD
-export const getTodayFormatted = (): string => {
-  const today = new Date();
-  return today.toISOString().split('T')[0];
-};
-
-// Calculate days between two dates
-export const daysBetween = (date1: Date, date2: Date): number => {
-  const oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-  const diffDays = Math.round(Math.abs((date1.getTime() - date2.getTime()) / oneDay));
-  return diffDays;
-};
-
-// Truncate string to a certain length
-export const truncateString = (str: string, num: number): string => {
-  if (str.length <= num) {
-    return str;
+  for (const [time, crowdLevel] of Object.entries(crowdData)) {
+    if (typeof crowdLevel === 'number' && crowdLevel < lowestCrowd) {
+      lowestCrowd = crowdLevel;
+      bestTime = time;
+    }
   }
-  return str.slice(0, num) + '...';
+  
+  if (!bestTime) return 'Any time';
+  
+  // Format time for display
+  const [hours] = bestTime.split(':').map(Number);
+  return hours === 0 ? '12 AM' : 
+         hours === 12 ? '12 PM' : 
+         hours > 12 ? `${hours - 12} PM` : 
+         `${hours} AM`;
 };
 
-// Validate email format
-export const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+// Get current crowd level based on crowd data
+export const getCurrentCrowdLevel = (crowdData: Record<string, number> = {}): CrowdLevel => {
+  if (Object.keys(crowdData).length === 0) return 'medium';
+  
+  const now = new Date();
+  const currentHour = now.getHours();
+  const timeKey = `${currentHour}:00`;
+  
+  // Get the crowd level for the current hour
+  const crowdLevel = crowdData[timeKey];
+  
+  if (typeof crowdLevel !== 'number') return 'medium';
+  
+  if (crowdLevel <= 40) return 'low';
+  if (crowdLevel <= 70) return 'medium';
+  return 'high';
 };
 
-// Validate password strength
-export const isValidPassword = (password: string): boolean => {
-  return password.length >= 8;
-};
-
-// Validate phone number
-export const isValidPhone = (phone: string): boolean => {
-  const phoneRegex = /^[0-9]{10}$/;
-  return phoneRegex.test(phone);
+// Generate initials from name
+export const getInitials = (name: string): string => {
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .join('')
+    .toUpperCase();
 };

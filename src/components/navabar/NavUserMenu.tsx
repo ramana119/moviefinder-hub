@@ -24,6 +24,12 @@ const NavUserMenu: React.FC<NavUserMenuProps> = ({
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Use name or construct fullName from firstName and lastName
+  const userName = currentUser?.fullName || 
+    (currentUser ? `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() : '') || 
+    currentUser?.name || 
+    (currentUser?.email ? currentUser.email.split('@')[0] : '');
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -93,7 +99,7 @@ const NavUserMenu: React.FC<NavUserMenuProps> = ({
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="flex items-center">
             <User className="h-4 w-4 mr-2" />
-            {currentUser.fullName.split(' ')[0]}
+            {userName.split(' ')[0]}
             {currentUser.isPremium && (
               <span className="ml-2 text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full">
                 Premium

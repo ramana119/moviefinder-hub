@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Filter, MapPin, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CrowdLevel } from '../types';
+import { CrowdLevel, DestinationFilters } from '../types';
 import { Slider } from '@/components/ui/slider';
 import { useDestinations } from '../context/DestinationContext';
 import { 
@@ -14,7 +14,6 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { formatPrice } from '../utils/helpers';
 import {
   Sheet,
   SheetContent,
@@ -23,6 +22,15 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
+
+// Helper function for price formatting
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(price);
+};
 
 const indiaStates = [
   'All States',
@@ -50,32 +58,32 @@ const SearchFilters: React.FC = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const handleStateChange = (value: string) => {
-    setFilters({ state: value === 'All States' ? null : value });
+    setFilters?.({ state: value === 'All States' ? null : value });
   };
 
   const handleCrowdLevelChange = (value: string) => {
-    setFilters({ crowdLevel: value === 'any' ? null : value as CrowdLevel });
+    setFilters?.({ crowdLevel: value === 'any' ? null : value as CrowdLevel });
   };
 
   const handlePriceChange = (value: number[]) => {
     setPriceRange([value[0], value[1]]);
-    setFilters({ minPrice: value[0], maxPrice: value[1] });
+    setFilters?.({ minPrice: value[0], maxPrice: value[1] });
   };
 
   const handleClearFilters = () => {
-    clearFilters();
+    clearFilters?.();
     setPriceRange([0, 5000]);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
+    setSearchQuery?.(e.target.value);
   };
 
   // Count active filters
   const activeFilterCount = 
-    (filters.crowdLevel ? 1 : 0) + 
-    (filters.minPrice || filters.maxPrice ? 1 : 0) + 
-    (filters.state ? 1 : 0);
+    (filters?.crowdLevel ? 1 : 0) + 
+    (filters?.minPrice || filters?.maxPrice ? 1 : 0) + 
+    (filters?.state ? 1 : 0);
 
   const FilterControls = () => (
     <>
@@ -86,7 +94,7 @@ const SearchFilters: React.FC = () => {
             <Input
               type="text"
               placeholder="Search by name, city or state..."
-              value={searchQuery}
+              value={searchQuery || ''}
               onChange={handleSearchChange}
               autoFocus={false}
               className="pl-10"
@@ -94,7 +102,7 @@ const SearchFilters: React.FC = () => {
             <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery?.('')}
                 className="absolute right-3 top-2.5"
               >
                 <X className="h-4 w-4 text-gray-400" />
@@ -106,7 +114,7 @@ const SearchFilters: React.FC = () => {
         <div>
           <label className="text-sm font-medium">Crowd Level</label>
           <Select
-            value={filters.crowdLevel || 'any'}
+            value={filters?.crowdLevel || 'any'}
             onValueChange={handleCrowdLevelChange}
           >
             <SelectTrigger className="w-full mt-1">
@@ -126,7 +134,7 @@ const SearchFilters: React.FC = () => {
         <div>
           <label className="text-sm font-medium">State</label>
           <Select
-            value={filters.state || 'All States'}
+            value={filters?.state || 'All States'}
             onValueChange={handleStateChange}
           >
             <SelectTrigger className="w-full mt-1">
@@ -166,7 +174,7 @@ const SearchFilters: React.FC = () => {
           onClick={handleClearFilters} 
           variant="outline" 
           className="w-full mt-2"
-          disabled={activeFilterCount === 0 && searchQuery === ''}
+          disabled={activeFilterCount === 0 && !searchQuery}
         >
           Clear All Filters
         </Button>
@@ -214,7 +222,7 @@ const SearchFilters: React.FC = () => {
             <Input
               type="text"
               placeholder="Search destinations..."
-              value={searchQuery}
+              value={searchQuery || ''}
               onChange={handleSearchChange}
               autoFocus={false}
               className="pl-10"
@@ -222,7 +230,7 @@ const SearchFilters: React.FC = () => {
             <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => setSearchQuery?.('')}
                 className="absolute right-3 top-2.5"
               >
                 <X className="h-4 w-4 text-gray-400" />

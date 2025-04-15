@@ -2,7 +2,6 @@
 import React from 'react';
 import { Bus, Train, Plane, Car, Clock } from 'lucide-react';
 import { TransportType } from '../types';
-import { formatPrice } from '../utils/helpers';
 
 interface ExtendedTransportType extends TransportType {
   busClass?: string;
@@ -34,6 +33,15 @@ interface TransportOptionCardProps {
   cost: number;
   isRecommended?: boolean;
 }
+
+// Helper function for price formatting
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(price);
+};
 
 const TransportOptionCard: React.FC<TransportOptionCardProps> = ({
   transport,
@@ -122,11 +130,11 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({
 
   // Simplified amenities rendering from string array
   const renderAmenityIcons = () => {
-    return transport.amenities.map((amenity, index) => (
+    return transport.amenities && transport.amenities.length > 0 ? transport.amenities.map((amenity, index) => (
       <span key={index} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
         {amenity}
       </span>
-    ));
+    )) : null;
   };
 
   return (
@@ -166,7 +174,7 @@ const TransportOptionCard: React.FC<TransportOptionCardProps> = ({
           </div>
           <div className="flex items-center justify-end text-sm text-gray-500 mt-1">
             <Clock className="h-4 w-4 mr-1" />
-            <span>{transport.estimatedDuration || `${transport.travelTime}h`}</span>
+            <span>{transport.estimatedDuration || `${transport.travelTime || 2}h`}</span>
           </div>
           {selected && (
             <div className="mt-2">

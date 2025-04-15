@@ -21,7 +21,13 @@ const NavUserMenu: React.FC = () => {
   
   if (!currentUser) return null;
   
-  const initials = currentUser.fullName
+  // Use name or construct fullName from firstName and lastName
+  const userName = currentUser.fullName || 
+    `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 
+    currentUser.name || 
+    currentUser.email.split('@')[0];
+  
+  const initials = userName
     .split(' ')
     .map(n => n[0])
     .join('')
@@ -46,7 +52,7 @@ const NavUserMenu: React.FC = () => {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel>
           <span className="font-normal text-sm text-muted-foreground">Signed in as</span>
-          <p className="font-medium">{currentUser.fullName}</p>
+          <p className="font-medium">{userName}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate('/profile')}>

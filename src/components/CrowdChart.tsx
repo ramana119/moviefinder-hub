@@ -62,11 +62,12 @@ const CrowdChart: React.FC<CrowdChartProps> = ({
   const chartData = Object.entries(crowdData).map(([time, value]) => {
     const [hours] = time.split(':').map(Number);
     const displayTime = hours === 0 ? '12 AM' : hours === 12 ? '12 PM' : hours > 12 ? `${hours - 12} PM` : `${hours} AM`;
+    const crowdValue = Number(value);
     
     return {
       time: displayTime,
-      crowd: value,
-      color: value <= 40 ? '#22c55e' : value <= 70 ? '#f59e0b' : '#ef4444',
+      crowd: crowdValue,
+      color: crowdValue <= 40 ? '#22c55e' : crowdValue <= 70 ? '#f59e0b' : '#ef4444',
     };
   });
 
