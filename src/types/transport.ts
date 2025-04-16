@@ -1,32 +1,19 @@
 
 export interface TransportType {
   id: string;
-  name?: string;
+  name: string;
   type: 'bus' | 'train' | 'flight' | 'car';
   pricePerPerson: number;
-  travelTime?: number;
-  amenities: string[];
-  busClass?: string;
-  seatType?: string;
-  class?: string;
-  berthOption?: string;
-  cabinClass?: string;
-  baggageAllowance?: string;
-  carType?: string;
-  transmission?: string;
-  operator?: string;
-  airline?: string;
-  rentalCompany?: string;
-  estimatedDuration?: string;
-  transportClass?: string; // Added for data compatibility
-  departureTime?: string; // Added for data compatibility
-  arrivalTime?: string; // Added for data compatibility
-  totalSeats?: number; // Added for data compatibility
-  availableSeats?: number; // Added for data compatibility
-  rating?: number; // Added for data compatibility
+  image?: string;
+  description?: string;
+  company?: string;
+  destinationId?: string;
+  departureTime?: string;
+  arrivalTime?: string;
+  duration?: string;
+  amenities?: string[];
+  transportClass?: string;  // Added for bus transport type
+  cabinClass?: string;      // Added for flight transport type
+  busClass?: string;        // Added for bus transport type
+  carType?: string;         // Added for car transport type
 }
-
-export type BusType = 'standard' | 'luxury' | 'sleeper' | 'volvo';
-export type TrainType = 'general' | 'sleeper' | 'ac-chair' | 'ac-sleeper';
-export type FlightType = 'economy' | 'business' | 'first-class';
-export type CarType = 'hatchback' | 'sedan' | 'suv' | 'luxury';

@@ -1,107 +1,107 @@
 
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from 'lucide-react';
 import NavLinks from './navbar/NavLinks';
 import NavLogo from './navbar/NavLogo';
 import NavUserMenu from './navbar/NavUserMenu';
-import { ThemeToggle } from './ThemeToggle';
+import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { currentUser } = useAuth();
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background">
-      <div className="container flex h-16 items-center justify-between">
-        <NavLogo />
+    <nav className="bg-background border-b sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center">
+              <NavLogo />
+              <span className="ml-2 text-xl font-bold tracking-tight">Zenway Travels</span>
+            </Link>
+          </div>
 
-        <div className="hidden md:flex">
-          <NavLinks />
-        </div>
+          <div className="hidden md:flex items-center space-x-1">
+            <NavLinks />
+          </div>
 
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          {isAuthenticated ? <NavUserMenu /> : (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate('/login')}
-              >
-                Login
-              </Button>
-              <Button
-                size="sm"
-                onClick={() => navigate('/signup')}
-              >
-                Sign Up
-              </Button>
-            </div>
-          )}
-          <MobileNav />
+          <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
+            {currentUser ? (
+              <NavUserMenu user={currentUser} />
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/login">Login</Link>
+                </Button>
+                <Button size="sm" asChild>
+                  <Link to="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center">
+            <ThemeToggle />
+            <button
+              onClick={toggleMenu}
+              className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none ml-2"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
-    </header>
-  );
-};
 
-const MobileNav = () => {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="w-full sm:w-64">
-        <SheetHeader>
-          <SheetTitle>Menu</SheetTitle>
-          <SheetDescription>
-            Navigate through the app
-          </SheetDescription>
-        </SheetHeader>
-        <div className="grid gap-4 py-4">
-          <Link to="/" className="px-4 py-2 rounded-md hover:bg-secondary">
-            Home
-          </Link>
-          <Link to="/destinations" className="px-4 py-2 rounded-md hover:bg-secondary">
-            Destinations
-          </Link>
-          <Link to="/about" className="px-4 py-2 rounded-md hover:bg-secondary">
-            About
-          </Link>
-          {isAuthenticated ? (
-            <>
-              <Link to="/bookings" className="px-4 py-2 rounded-md hover:bg-secondary">
-                My Bookings
-              </Link>
-              <Link to="/trip-planner" className="px-4 py-2 rounded-md hover:bg-secondary">
-                Trip Planner
-              </Link>
-              <Link to="/profile" className="px-4 py-2 rounded-md hover:bg-secondary">
-                Profile
-              </Link>
-            </>
-          ) : (
-            <>
-              <Button variant="outline" size="sm" onClick={() => navigate('/login')}>
-                Login
-              </Button>
-              <Button size="sm" onClick={() => navigate('/signup')}>
-                Sign Up
-              </Button>
-            </>
-          )}
+      {/* Mobile menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-background border-t">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex flex-col space-y-2">
+              <div className="py-2">
+                <NavLinks />
+              </div>
+              <div className="pt-2 border-t">
+                {currentUser ? (
+                  <div className="py-2">
+                    <Link to="/profile" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                      My Profile
+                    </Link>
+                    <Link to="/my-bookings" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
+                      My Bookings
+                    </Link>
+                    <button className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500">
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-2 py-2">
+                    <Button className="w-full" asChild>
+                      <Link to="/signup">Sign Up</Link>
+                    </Button>
+                    <Button variant="outline" className="w-full" asChild>
+                      <Link to="/login">Login</Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      )}
+    </nav>
   );
 };
 

@@ -28,9 +28,12 @@ const GuideCard: React.FC<GuideCardProps> = ({
     >
       <div className="relative h-40">
         <img
-          src={guide.imageUrl || "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"}
+          src={`${guide.imageUrl}?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80`}
           alt={guide.name}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+          }}
         />
         {isSelected && (
           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">

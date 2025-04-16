@@ -1,89 +1,29 @@
 
-export const getTransportAmenities = (type: string, isOvernight: boolean = false): string[] => {
-  const baseAmenities = ['Air Conditioning', 'Comfortable Seating'];
+// Get transport amenities based on type and whether it's overnight
+export const getTransportAmenities = (type: string, isOvernight: boolean) => {
+  const baseAmenities = {
+    bus: ['Air conditioning', 'Reclining seats', 'Entertainment system', 'Onboard washroom'],
+    train: ['Sleeping berths', 'Food service', 'Washroom', 'Power outlets'],
+    flight: ['Meals', 'Entertainment system', 'Beverage service', 'Reading materials'],
+    car: ['Air conditioning', 'Audio system', 'Privacy', 'Flexible stops']
+  };
   
-  switch(type) {
-    case 'bus':
-      return isOvernight 
-        ? [...baseAmenities, 'Sleeper Berths', 'Blankets', 'Reading Light', 'Toilet']
-        : [...baseAmenities, 'Water Bottle', 'Entertainment System', 'Toilet'];
-      
-    case 'train':
-      return isOvernight 
-        ? [...baseAmenities, 'Sleeper Berths', 'Bedding', 'Reading Light', 'Charging Ports', 'Dining Car']
-        : [...baseAmenities, 'Charging Ports', 'Food Service', 'Large Windows'];
-    
-    case 'flight':
-      return [...baseAmenities, 'Meal Service', 'Entertainment System', 'Charging Ports', 'Baggage Allowance'];
-      
-    case 'car':
-      return [...baseAmenities, 'GPS Navigation', 'Music System', 'Flexible Stops'];
-      
-    default:
-      return baseAmenities;
-  }
-};
-
-export const suggestAccommodation = (
-  travelStyle: 'base-hotel' | 'mobile' = 'base-hotel',
-  transportType: 'bus' | 'train' | 'flight' | 'car' = 'car',
-  isPremium: boolean = false
-): string[] => {
-  if (travelStyle === 'mobile') {
-    if (transportType === 'train' && isPremium) {
-      return ['First Class Sleeper Cabins', 'Premium Overnight Trains'];
-    }
-    
-    if (transportType === 'bus' && isPremium) {
-      return ['Luxury Sleeper Coaches', 'Premium Overnight Buses'];
-    }
-    
-    if (transportType === 'car') {
-      return isPremium 
-        ? ['Premium Roadside Hotels', 'Luxury Camper Vans'] 
-        : ['Budget Roadside Hotels', 'Motels'];
-    }
-    
-    return ['Different hotels at each destination'];
+  const overnightAmenities = {
+    bus: ['Sleeper seats', 'Blankets', 'Pillows', 'Night travel time saving'],
+    train: ['Private cabins', 'Berths', 'Bedding', '24-hour service'],
+    flight: ['Red-eye options', 'Night kits', 'Full recline seats', 'Quiet cabin'],
+    car: ['Rest stops included', 'Hotel package', 'Split driving', 'Safe night parking']
+  };
+  
+  // Handle unknown types gracefully
+  const transportType = ['bus', 'train', 'flight', 'car'].includes(type) ? type : 'car';
+  
+  if (isOvernight) {
+    return [
+      ...(baseAmenities[transportType as keyof typeof baseAmenities] || []),
+      ...(overnightAmenities[transportType as keyof typeof overnightAmenities] || [])
+    ];
   }
   
-  return isPremium 
-    ? ['Luxury hotels', 'Premium resorts', 'Boutique accommodations'] 
-    : ['Standard hotels', 'Budget-friendly options', 'Homestays'];
-};
-
-export const estimateDailyActivities = (
-  destinationType: string | undefined,
-  isPremium: boolean = false
-): string[] => {
-  const baseActivities = ['Local sightseeing', 'Cultural experiences'];
-  
-  const premiumActivities = isPremium 
-    ? ['Private guided tours', 'Exclusive experiences', 'Priority access'] 
-    : [];
-  
-  switch(destinationType) {
-    case 'nature':
-      return [...baseActivities, ...premiumActivities, 'Hiking', 'Wildlife spotting', 'Photography'];
-    
-    case 'beach':
-    case 'ocean':
-      return [...baseActivities, ...premiumActivities, 'Swimming', 'Water sports', 'Sunset viewing'];
-    
-    case 'city':
-    case 'urban':
-      return [...baseActivities, ...premiumActivities, 'Shopping', 'Museum visits', 'Local cuisine'];
-    
-    case 'mountains':
-    case 'hiking':
-      return [...baseActivities, ...premiumActivities, 'Trekking', 'Camping', 'Scenic viewpoints'];
-    
-    case 'history':
-    case 'culture':
-    case 'ancient':
-      return [...baseActivities, ...premiumActivities, 'Monument visits', 'Historical tours', 'Traditional experiences'];
-    
-    default:
-      return [...baseActivities, ...premiumActivities, 'Local exploration', 'Photography', 'Relaxation'];
-  }
+  return baseAmenities[transportType as keyof typeof baseAmenities] || [];
 };

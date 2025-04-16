@@ -36,6 +36,9 @@ const HotelCard: React.FC<HotelCardProps> = ({
           src={hotel.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"}
           alt={hotel.name}
           className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+          }}
         />
         <Badge 
           className="absolute top-2 right-2 capitalize" 
@@ -50,7 +53,10 @@ const HotelCard: React.FC<HotelCardProps> = ({
             <h3 className="font-semibold">{hotel.name}</h3>
             <div className="flex items-center text-sm text-muted-foreground mt-1">
               <MapPin className="h-3.5 w-3.5 mr-1" />
-              <span>{destination?.name || hotel.location?.city || 'Location unavailable'}</span>
+              <span>
+                {destination?.name || 
+                 (hotel.location?.address ? hotel.location.address.split(',')[0] : 'Location unavailable')}
+              </span>
             </div>
           </div>
           <div className="text-right">
