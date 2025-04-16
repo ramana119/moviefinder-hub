@@ -19,8 +19,8 @@ const GuideSelector: React.FC<GuideSelectorProps> = ({
   isPremium
 }) => {
   // Display premium guides or highlight premium benefits
-  const premiumGuides = availableGuides.filter(guide => guide.isPremium);
-  const regularGuides = availableGuides.filter(guide => !guide.isPremium);
+  const premiumGuides = availableGuides.filter(guide => guide.isPremium === true);
+  const regularGuides = availableGuides.filter(guide => guide.isPremium !== true);
 
   // Sort guides by rating
   const sortedRegularGuides = [...regularGuides].sort((a, b) => (b.rating || 0) - (a.rating || 0));

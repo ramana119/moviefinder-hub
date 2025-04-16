@@ -8,4 +8,5 @@ export interface GuideType {
   imageUrl: string;
   rating: number;
   experience?: number;
+  isPremium?: boolean;
 }

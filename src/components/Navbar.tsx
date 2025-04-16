@@ -35,7 +35,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             {currentUser ? (
-              <NavUserMenu currentUser={currentUser} />
+              <NavUserMenu />
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" size="sm" asChild>

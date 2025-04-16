@@ -78,7 +78,7 @@ const DatePeoplePicker: React.FC<DatePeoplePickerProps> = ({
               variant="outline" 
               size="icon"
               disabled={numberOfDays <= 1}
-              onClick={() => setNumberOfDays(prev => Math.max(1, prev - 1))}
+              onClick={() => setNumberOfDays(Math.max(1, numberOfDays - 1))}
             >
               -
             </Button>
@@ -94,7 +94,7 @@ const DatePeoplePicker: React.FC<DatePeoplePickerProps> = ({
             <Button 
               variant="outline" 
               size="icon"
-              onClick={() => setNumberOfDays(prev => prev + 1)}
+              onClick={() => setNumberOfDays(numberOfDays + 1)}
             >
               +
             </Button>
@@ -108,7 +108,7 @@ const DatePeoplePicker: React.FC<DatePeoplePickerProps> = ({
               variant="outline" 
               size="icon"
               disabled={numberOfPeople <= 1}
-              onClick={() => setNumberOfPeople(prev => Math.max(1, prev - 1))}
+              onClick={() => setNumberOfPeople(Math.max(1, numberOfPeople - 1))}
             >
               -
             </Button>
@@ -124,7 +124,7 @@ const DatePeoplePicker: React.FC<DatePeoplePickerProps> = ({
             <Button 
               variant="outline" 
               size="icon"
-              onClick={() => setNumberOfPeople(prev => prev + 1)}
+              onClick={() => setNumberOfPeople(numberOfPeople + 1)}
             >
               +
             </Button>

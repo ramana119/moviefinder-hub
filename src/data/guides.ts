@@ -11,7 +11,8 @@ export const guides: GuideType[] = [
     languages: ['Hindi', 'English', 'French'],
     experience: 12,
     rating: 4.8,
-    imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956'
+    imageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956',
+    isPremium: true
   },
   {
     id: 'guide_002',
@@ -33,7 +34,8 @@ export const guides: GuideType[] = [
     languages: ['Hindi', 'English', 'German'],
     experience: 10,
     rating: 4.7,
-    imageUrl: 'https://images.unsplash.com/photo-1621551816506-3c6de908947c'
+    imageUrl: 'https://images.unsplash.com/photo-1621551816506-3c6de908947c',
+    isPremium: true
   },
   {
     id: 'guide_004',
@@ -55,7 +57,8 @@ export const guides: GuideType[] = [
     languages: ['Hindi', 'English', 'Portuguese'],
     experience: 7,
     rating: 4.9,
-    imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330'
+    imageUrl: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+    isPremium: true
   },
   {
     id: 'guide_006',
@@ -77,7 +80,8 @@ export const guides: GuideType[] = [
     languages: ['Hindi', 'English', 'Sanskrit'],
     experience: 15,
     rating: 4.8,
-    imageUrl: 'https://images.unsplash.com/photo-1499996860823-5214fcc65f8f'
+    imageUrl: 'https://images.unsplash.com/photo-1499996860823-5214fcc65f8f',
+    isPremium: true
   },
   {
     id: 'guide_008',
@@ -99,7 +103,8 @@ export const guides: GuideType[] = [
     languages: ['Hindi', 'English', 'Nepali', 'Tibetan'],
     experience: 13,
     rating: 4.9,
-    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e'
+    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e',
+    isPremium: true
   },
   {
     id: 'guide_010',

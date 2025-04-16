@@ -52,11 +52,11 @@ const DestinationSelector: React.FC<DestinationSelectorProps> = ({
             <div className="p-4">
               <h3 className="text-lg font-semibold">{destination.name}</h3>
               <p className="text-sm text-muted-foreground line-clamp-2">{destination.description}</p>
-              {destination.crowdLevel && (
+              {destination.crowdData && (
                 <div className="mt-2 flex items-center">
                   <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                    {destination.crowdLevel === 'low' ? 'Low crowds' : 
-                     destination.crowdLevel === 'medium' ? 'Moderate crowds' : 'High crowds'}
+                    {Object.values(destination.crowdData).reduce((a, b) => a + b, 0) / Object.values(destination.crowdData).length < 50 ? 'Low crowds' : 
+                     Object.values(destination.crowdData).reduce((a, b) => a + b, 0) / Object.values(destination.crowdData).length < 75 ? 'Moderate crowds' : 'High crowds'}
                   </span>
                 </div>
               )}
