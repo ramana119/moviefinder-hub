@@ -82,7 +82,17 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [calculateDistance]);
 
   const calculateHotelProximity = useCallback((hotel: HotelType, destination: Destination): HotelType => {
-    if (!destination.coordinates || !hotel.location) return hotel;
+    if (!destination.coordinates || !hotel.location) {
+      return {
+        ...hotel,
+        location: hotel.location || {
+          coordinates: { lat: 0, lng: 0 },
+          address: 'Unknown location',
+          distanceFromCenter: 0,
+          proximityScore: 5
+        }
+      };
+    }
     
     const distance = calculateDistance(
       hotel.location.coordinates.lat,
@@ -105,9 +115,11 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const getHotelsByDestination = useCallback((destinationId: string): HotelType[] => {
     const destination = destinations.find(d => d.id === destinationId);
+    if (!destination) return [];
+    
     return hotels
       .filter(hotel => hotel.destinationId === destinationId)
-      .map(hotel => destination ? calculateHotelProximity(hotel, destination) : hotel);
+      .map(hotel => calculateHotelProximity(hotel, destination));
   }, [destinations, calculateHotelProximity]);
 
   const getNearbyHotels = useCallback((destinationId: string, limit = 3) => {
@@ -122,28 +134,40 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [getHotelsByDestination]);
 
   const getOptimalHotels = useCallback((destinationIds: string[]): HotelType[] => {
+    if (!destinationIds || destinationIds.length === 0) {
+      return [];
+    }
+    
     const destinationHotels = destinationIds.map(destId => {
       const destination = destinations.find(d => d.id === destId);
+      if (!destination) return [];
+      
       return hotels
         .filter(h => h.destinationId === destId)
-        .map(h => destination ? calculateHotelProximity(h, destination) : h);
+        .map(h => calculateHotelProximity(h, destination));
     });
 
+    if (destinationHotels.length === 0 || destinationHotels.some(hotels => hotels.length === 0)) {
+      return [];
+    }
+
     const avgProximity = destinationHotels.reduce((sum, hotels) => {
-      const destAvg = hotels.reduce((sum, hotel) => 
-        sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / hotels.length;
+      const destAvg = hotels.length > 0 
+        ? hotels.reduce((sum, hotel) => sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / hotels.length
+        : 0;
       return sum + destAvg;
     }, 0) / destinationIds.length;
 
-    return destinationHotels.map(hotels => 
-      hotels.sort((a, b) => {
-        if (a.location && b.location) {
-          return Math.abs(a.location.proximityScore - avgProximity) - 
-                 Math.abs(b.location.proximityScore - avgProximity);
-        }
-        return 0;
-      })[0]
-    );
+    return destinationHotels.map(hotels => {
+      if (hotels.length === 0) {
+        return null;
+      }
+      return hotels.sort((a, b) => {
+        const aScore = a.location ? a.location.proximityScore : 0;
+        const bScore = b.location ? b.location.proximityScore : 0;
+        return Math.abs(aScore - avgProximity) - Math.abs(bScore - avgProximity);
+      })[0];
+    }).filter(Boolean) as HotelType[];
   }, [destinations, calculateHotelProximity]);
 
   const getDistanceMatrix = useCallback((destinationIds: string[]) => {
@@ -224,7 +248,7 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
     
     return itinerary;
-  }, [destinations, getDistanceMatrix, getOptimalHotels]);
+  }, [destinations, getDistanceMatrix]);
 
   const saveTripPlan = useCallback(async (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>): Promise<string> => {
     setError(null);
@@ -238,19 +262,55 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const newTripPlanId = `trip_${uuidv4()}`;
       const transportType = tripPlanData.transportType || 'car';
       
-      const optimalHotels = getOptimalHotels(tripPlanData.selectedDestinations);
+      let optimalHotels: HotelType[] = [];
       
-      const itinerary = generateOptimalItinerary({
-        destinationIds: tripPlanData.selectedDestinations,
-        transportType,
-        numberOfDays: tripPlanData.numberOfDays,
-        startDate: new Date(tripPlanData.startDate),
-        travelStyle: tripPlanData.travelStyle,
-        isPremium: tripPlanData.isPremium
-      });
+      try {
+        optimalHotels = getOptimalHotels(tripPlanData.selectedDestinations);
+      } catch (hotelErr) {
+        console.error('Error finding optimal hotels:', hotelErr);
+        setError('Failed to find optimal hotels');
+      }
       
-      const avgProximityScore = optimalHotels.reduce((sum, hotel) => 
-        sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / optimalHotels.length;
+      let itinerary: TripItineraryDay[] = [];
+      
+      try {
+        itinerary = generateOptimalItinerary({
+          destinationIds: tripPlanData.selectedDestinations,
+          transportType,
+          numberOfDays: tripPlanData.numberOfDays,
+          startDate: new Date(tripPlanData.startDate),
+          travelStyle: tripPlanData.travelStyle,
+          isPremium: tripPlanData.isPremium
+        });
+      } catch (itineraryErr) {
+        console.error('Error generating itinerary:', itineraryErr);
+        setError('Failed to generate itinerary');
+        const startDate = new Date(tripPlanData.startDate);
+        itinerary = tripPlanData.selectedDestinations.map((destId, idx) => {
+          const dest = destinations.find(d => d.id === destId);
+          const day = idx + 1;
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + idx);
+          
+          return {
+            day,
+            date,
+            destinationId: destId,
+            destinationName: dest?.name || 'Unknown Destination',
+            activities: ['Explore the area'],
+            isTransitDay: false,
+            detailedSchedule: [
+              { time: '09:00', activity: 'Sightseeing', location: dest?.name || 'Unknown' }
+            ],
+            hotels: [destId]
+          };
+        });
+      }
+      
+      const avgProximityScore = optimalHotels.length > 0
+        ? optimalHotels.reduce((sum, hotel) => 
+            sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / optimalHotels.length
+        : 5; // Default mid-range score if no hotels
 
       const newTripPlan: TripPlan = {
         ...tripPlanData,
@@ -283,7 +343,7 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } finally {
       setLoading(false);
     }
-  }, [getOptimalHotels, generateOptimalItinerary, saveBookingTripPlan, toast]);
+  }, [getOptimalHotels, generateOptimalItinerary, saveBookingTripPlan, toast, destinations]);
 
   const getUserTripPlans = useCallback((userId: string) => {
     return tripPlans.filter(plan => plan.userId === userId);
@@ -320,20 +380,49 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     transportType: 'bus' | 'train' | 'flight' | 'car';
     numberOfDays: number;
     numberOfPeople: number;
+    travelStyle?: 'base-hotel' | 'mobile';
   }) => {
     const selectedDestinations = options.destinationIds
       .map(id => destinations.find(d => d.id === id))
       .filter(Boolean) as Destination[];
-    const destinationsCost = selectedDestinations.reduce((sum, dest) => sum + getBasePrice(dest.price || 0), 0) * options.numberOfPeople;
     
-    const hotelCostPerDay = hotels
-      .filter(h => options.destinationIds.includes(h.destinationId) && h.type === options.hotelType)
-      .reduce((sum, h) => sum + h.pricePerPerson, 0) / options.destinationIds.length;
+    const destinationsCost = selectedDestinations.reduce((sum, dest) => 
+      sum + getBasePrice(dest.price || 0), 0) * options.numberOfPeople;
+    
+    let hotelCostPerDay = 0;
+    const selectedHotels = hotels.filter(h => 
+      options.destinationIds.includes(h.destinationId) && h.type === options.hotelType
+    );
+    
+    if (selectedHotels.length > 0) {
+      if (options.travelStyle === 'base-hotel' && options.destinationIds.length === 1) {
+        hotelCostPerDay = selectedHotels[0].pricePerPerson;
+      } else if (options.travelStyle === 'base-hotel' && options.destinationIds.length > 1) {
+        const cheapestHotels = options.destinationIds.map(destId => {
+          const destHotels = hotels.filter(h => h.destinationId === destId && h.type === options.hotelType);
+          return destHotels.sort((a, b) => a.pricePerPerson - b.pricePerPerson)[0];
+        }).filter(Boolean);
+        
+        if (cheapestHotels.length > 0) {
+          hotelCostPerDay = cheapestHotels.reduce((sum, h) => sum + h.pricePerPerson, 0) / cheapestHotels.length;
+        }
+      } else if (options.travelStyle === 'mobile') {
+        hotelCostPerDay = (selectedHotels.reduce((sum, h) => sum + h.pricePerPerson, 0) / selectedHotels.length) * 
+          (options.destinationIds.length > 1 ? 1.15 : 1);
+      }
+    }
+    
     const hotelsCost = hotelCostPerDay * options.numberOfPeople * options.numberOfDays;
     
-    const transportCost = transports
+    const baseTransportCost = transports
       .filter(t => t.type === options.transportType)
-      .reduce((sum, t) => sum + t.pricePerPerson, 0) * options.numberOfPeople;
+      .reduce((sum, t) => sum + t.pricePerPerson, 0) / 
+      (transports.filter(t => t.type === options.transportType).length || 1);
+    
+    const transportMultiplier = options.destinationIds.length > 1 ? 
+      (options.destinationIds.length - 1) * 0.8 : 1;
+    
+    const transportCost = baseTransportCost * options.numberOfPeople * transportMultiplier;
     
     const guidesCost = guides
       .filter(g => options.guideIds.includes(g.id))
