@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDestinations } from '../context/DestinationContext';
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { CalendarIcon, MapPin, Clock, Users, CreditCard, Check } from 'lucide-react';
 import { Loader2 } from 'lucide-react';
 import { formatPrice, getBasePrice } from '../utils/helpers';
+import { Label } from '@/components/ui/label';
 
 const Booking = () => {
   const { id } = useParams<{ id: string }>();
@@ -59,6 +61,10 @@ const Booking = () => {
           visitors,
           totalAmount,
           ticketType,
+          numberOfTravelers: visitors,
+          startDate: checkIn?.toISOString() || new Date().toISOString(),
+          endDate: checkOut?.toISOString() || new Date().toISOString(),
+          totalPrice: totalAmount
         };
         
         await addBooking(bookingData);
@@ -71,6 +77,10 @@ const Booking = () => {
           visitors,
           totalAmount,
           ticketType,
+          numberOfTravelers: visitors,
+          startDate: checkIn?.toISOString() || new Date().toISOString(),
+          endDate: checkOut?.toISOString() || new Date().toISOString(),
+          totalPrice: totalAmount
         };
         
         await bookTrip(bookingData);

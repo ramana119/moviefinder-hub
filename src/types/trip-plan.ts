@@ -1,4 +1,9 @@
 
+import { HotelType } from './hotel';
+import { TransportType } from './transport';
+import { GuideType } from './guide';
+import { Destination } from './destination';
+
 export interface TripPlan {
   id: string;
   userId: string;

@@ -1,4 +1,6 @@
 
+import { TripPlan } from './trip-plan';
+
 export interface Booking {
   id: string;
   userId: string;

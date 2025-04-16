@@ -18,6 +18,12 @@ export interface TransportType {
   airline?: string;
   rentalCompany?: string;
   estimatedDuration?: string;
+  transportClass?: string; // Added for data compatibility
+  departureTime?: string; // Added for data compatibility
+  arrivalTime?: string; // Added for data compatibility
+  totalSeats?: number; // Added for data compatibility
+  availableSeats?: number; // Added for data compatibility
+  rating?: number; // Added for data compatibility
 }
 
 export type BusType = 'standard' | 'luxury' | 'sleeper' | 'volvo';
