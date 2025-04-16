@@ -9,9 +9,9 @@ const NavLogo: React.FC = () => {
   const { currentUser } = useAuth();
   
   return (
-    <Link to="/" className="flex items-center space-x-2">
+    <div className="flex items-center space-x-2">
       <MapPin className="h-6 w-6 text-primary" />
-      <span className="font-semibold">CrowdLess</span>
+      <span className="font-semibold">Zenway</span>
       {currentUser?.isPremium && (
         <TooltipProvider>
           <Tooltip>
@@ -26,7 +26,7 @@ const NavLogo: React.FC = () => {
           </Tooltip>
         </TooltipProvider>
       )}
-    </Link>
+    </div>
   );
 };
 

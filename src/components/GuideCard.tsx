@@ -28,16 +28,21 @@ const GuideCard: React.FC<GuideCardProps> = ({
     >
       <div className="relative h-40">
         <img
-          src={`${guide.imageUrl}?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80`}
+          src={guide.imageUrl || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"}
           alt={guide.name}
           className="w-full h-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
+            e.currentTarget.src = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80";
           }}
         />
         {isSelected && (
           <div className="absolute top-2 right-2 bg-primary text-white rounded-full p-1">
             <Check className="h-4 w-4" />
+          </div>
+        )}
+        {guide.isPremium && (
+          <div className="absolute top-2 left-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded">
+            PREMIUM
           </div>
         )}
       </div>
@@ -60,20 +65,24 @@ const GuideCard: React.FC<GuideCardProps> = ({
           {Array.from({ length: 5 }).map((_, i) => (
             <Star 
               key={i} 
-              className={`h-4 w-4 ${i < guide.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
+              className={`h-4 w-4 ${i < (guide.rating || 4) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200'}`}
             />
           ))}
-          <span className="text-xs ml-1 text-muted-foreground">({guide.rating}/5)</span>
+          <span className="text-xs ml-1 text-muted-foreground">({guide.rating || 4}/5)</span>
         </div>
         
         <div className="mt-3 flex items-center">
           <Globe className="h-4 w-4 mr-1 text-muted-foreground" />
           <div className="flex flex-wrap gap-1">
-            {guide.languages.map((language, i) => (
-              <Badge key={i} variant="outline" className="text-xs font-normal">
-                {language}
-              </Badge>
-            ))}
+            {guide.languages && guide.languages.length > 0 ? (
+              guide.languages.map((language, i) => (
+                <Badge key={i} variant="outline" className="text-xs font-normal">
+                  {language}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline" className="text-xs font-normal">English</Badge>
+            )}
           </div>
         </div>
       </CardContent>

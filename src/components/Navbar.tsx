@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import ThemeToggle from './ThemeToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 import NavLinks from './navbar/NavLinks';
 import NavLogo from './navbar/NavLogo';
@@ -35,7 +35,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
             {currentUser ? (
-              <NavUserMenu user={currentUser} />
+              <NavUserMenu currentUser={currentUser} />
             ) : (
               <div className="flex items-center space-x-2">
                 <Button variant="outline" size="sm" asChild>

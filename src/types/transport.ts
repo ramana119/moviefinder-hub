@@ -12,8 +12,14 @@ export interface TransportType {
   arrivalTime?: string;
   duration?: string;
   amenities?: string[];
-  transportClass?: string;  // Added for bus transport type
-  cabinClass?: string;      // Added for flight transport type
-  busClass?: string;        // Added for bus transport type
-  carType?: string;         // Added for car transport type
+  transportClass?: string;  
+  cabinClass?: string;      
+  busClass?: string;        
+  carType?: string;         
+  // Add missing properties used in transports.ts
+  travelTime?: number;
+  operator?: string;
+  totalSeats?: number;
+  availableSeats?: number;
+  rating?: number;
 }
