@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Layout from '../components/Layout';
 import { Button } from '@/components/ui/button';
@@ -7,10 +6,22 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Send, MoreHorizontal, Phone, Video, Bot, User, Info, ArrowRight, MessageSquare } from 'lucide-react';
+import { 
+  Send, 
+  MoreHorizontal, 
+  Phone, 
+  Video, 
+  Bot, 
+  User, 
+  Info, 
+  ArrowRight, 
+  MessageSquare, 
+  CheckCircle, 
+  Mail, 
+  Clock 
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-// Define message types
 interface Message {
   id: string;
   text: string;
@@ -19,7 +30,6 @@ interface Message {
   status?: 'sent' | 'delivered' | 'read';
 }
 
-// Sample pre-defined AI responses
 const aiResponses = [
   "Thanks for reaching out! I'd be happy to help with your travel planning.",
   "Great question! Based on your preferences, I'd recommend visiting early morning or late afternoon to avoid crowds.",
@@ -31,7 +41,6 @@ const aiResponses = [
   "Based on our data, crowd levels are predicted to be lowest between 9-10 AM and after 4 PM for that destination."
 ];
 
-// Sample human agent responses
 const agentResponses = [
   "Hello! I'm Priya from Zenway Travels customer support. How can I assist you today?",
   "I understand your concern. Let me check your booking details right away.",
@@ -51,12 +60,11 @@ const Support: React.FC = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [agentIsTyping, setAgentIsTyping] = useState(false);
   const [agentOnline, setAgentOnline] = useState(false);
-  const [agentResponseTime, setAgentResponseTime] = useState(3); // minutes
-  
+  const [agentResponseTime, setAgentResponseTime] = useState(3);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const agentMessagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to bottom whenever messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -65,7 +73,6 @@ const Support: React.FC = () => {
     agentMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [agentMessages]);
 
-  // Initial bot message
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
@@ -79,10 +86,8 @@ const Support: React.FC = () => {
     }
   }, [messages]);
 
-  // Initial live chat setup
   useEffect(() => {
     const checkAgentAvailability = () => {
-      // Simulate agent availability changing
       const isAvailable = Math.random() > 0.3;
       setAgentOnline(isAvailable);
       setAgentResponseTime(Math.floor(Math.random() * 5) + 1);
@@ -111,7 +116,6 @@ const Support: React.FC = () => {
     e.preventDefault();
     if (input.trim() === '') return;
     
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: input,
@@ -123,12 +127,9 @@ const Support: React.FC = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     
-    // Simulate bot thinking
     setIsTyping(true);
     
-    // Delayed bot response
     setTimeout(() => {
-      // Random response from array
       const botResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
       
       const botMessage: Message = {
@@ -147,7 +148,6 @@ const Support: React.FC = () => {
     e.preventDefault();
     if (agentInput.trim() === '') return;
     
-    // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
       text: agentInput,
@@ -159,11 +159,9 @@ const Support: React.FC = () => {
     setAgentMessages(prev => [...prev, userMessage]);
     setAgentInput('');
     
-    // Simulate agent typing if they're online
     if (agentOnline) {
       setAgentIsTyping(true);
       
-      // Delayed agent response
       setTimeout(() => {
         const agentResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
         
@@ -178,7 +176,6 @@ const Support: React.FC = () => {
         setAgentIsTyping(false);
       }, 2000);
     } else {
-      // If agent is offline, show a standard message
       setTimeout(() => {
         const agentMessage: Message = {
           id: (Date.now() + 1).toString(),

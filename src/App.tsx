@@ -47,7 +47,7 @@ function App() {
                   <Route path="/premium-features" element={<PremiumFeatures />} />
                   
                   {/* Protected Routes */}
-                  <Route element={<RouteGuard />}>
+                  <Route element={<RouteGuard>{/* This adds the children prop */}</RouteGuard>}>
                     <Route path="/bookings" element={<MyBookings />} />
                     <Route path="/bookings/:id" element={<BookingDetails />} />
                     <Route path="/profile" element={<Profile />} />
