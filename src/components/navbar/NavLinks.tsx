@@ -1,47 +1,79 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
-const NavLinks: React.FC = () => {
+interface NavLinksProps {
+  isPremium?: boolean;
+  isMobileView?: boolean;
+  onItemClick?: () => void;
+}
+
+const NavLinks: React.FC<NavLinksProps> = ({ 
+  isPremium = false, 
+  isMobileView = false,
+  onItemClick = () => {} 
+}) => {
   const location = useLocation();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
+  const linkClasses = (path: string) => {
+    if (isMobileView) {
+      return `px-2 py-2 rounded-md ${
+        isActive(path) ? 'bg-primary/10 text-primary' : 'text-gray-700'
+      }`;
+    }
+    return `text-sm font-medium transition-colors ${
+      isActive(path) ? 'text-primary' : 'text-gray-700 hover:text-primary'
+    }`;
+  };
+
   return (
-    <nav className="flex items-center space-x-6">
-      <Link 
-        to="/" 
-        className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-primary' : 'hover:text-primary'}`}
+    <div className={`${isMobileView ? 'flex flex-col space-y-2' : 'flex items-center space-x-6'}`}>
+      <Link
+        to="/"
+        className={linkClasses('/')}
+        onClick={onItemClick}
       >
         Home
       </Link>
-      <Link 
-        to="/destinations" 
-        className={`text-sm font-medium transition-colors ${isActive('/destinations') ? 'text-primary' : 'hover:text-primary'}`}
+      <Link
+        to="/destinations"
+        className={linkClasses('/destinations')}
+        onClick={onItemClick}
       >
         Destinations
       </Link>
-      <Link 
-        to="/trip-planner" 
-        className={`text-sm font-medium transition-colors ${isActive('/trip-planner') ? 'text-primary' : 'hover:text-primary'}`}
+      <Link
+        to="/trip-planner"
+        className={linkClasses('/trip-planner')}
+        onClick={onItemClick}
       >
         Plan Trip
       </Link>
-      <Link 
-        to="/about" 
-        className={`text-sm font-medium transition-colors ${isActive('/about') ? 'text-primary' : 'hover:text-primary'}`}
+      <Link
+        to="/about"
+        className={linkClasses('/about')}
+        onClick={onItemClick}
       >
         About
       </Link>
-      <Link 
-        to="/premium-features" 
-        className={`text-sm font-medium transition-colors ${isActive('/premium-features') ? 'text-primary' : 'hover:text-primary'}`}
-      >
-        Premium
-      </Link>
-    </nav>
+      {!isPremium && (
+        <Link
+          to="/premium-features"
+          className={isMobileView 
+            ? `px-2 py-2 rounded-md text-primary flex items-center ${isActive('/premium-features') ? 'bg-primary/10' : ''}` 
+            : "text-sm font-medium text-primary flex items-center"}
+          onClick={onItemClick}
+        >
+          <Star className="h-4 w-4 mr-1" />
+          Premium
+        </Link>
+      )}
+    </div>
   );
 };
 

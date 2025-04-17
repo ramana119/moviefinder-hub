@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
-import NavLinks from './navbar/NavLinks';
-import NavLogo from './navbar/NavLogo';
-import NavUserMenu from './navbar/NavUserMenu';
+import NavLinks from './navabar/NavLinks';
+import NavLogo from './navabar/NavLogo';
+import NavUserMenu from './navabar/NavUserMenu';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
@@ -28,7 +28,7 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex items-center space-x-1">
-            <NavLinks />
+            <NavLinks isPremium={currentUser?.isPremium} />
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -70,11 +70,18 @@ const Navbar = () => {
           <div className="container mx-auto px-4 py-3">
             <div className="flex flex-col space-y-2">
               <div className="py-2">
-                <NavLinks isMobileView={true} onItemClick={() => setIsMenuOpen(false)} />
+                <NavLinks 
+                  isPremium={currentUser?.isPremium}
+                  isMobileView={true} 
+                  onItemClick={() => setIsMenuOpen(false)} 
+                />
               </div>
               <div className="pt-2 border-t">
                 {currentUser ? (
-                  <NavUserMenu isMobileView={true} onItemClick={() => setIsMenuOpen(false)} />
+                  <NavUserMenu 
+                    isMobileView={true} 
+                    onItemClick={() => setIsMenuOpen(false)} 
+                  />
                 ) : (
                   <div className="flex flex-col space-y-2 py-2">
                     <Button className="w-full" asChild>
