@@ -26,13 +26,13 @@ const NavLinks: React.FC<NavLinksProps> = ({
         isActive(path) ? 'bg-primary/10 text-primary' : 'text-gray-700'
       }`;
     }
-    return `font-medium space-x-4 ${
+    return `font-medium ${
       isActive(path) ? 'text-primary' : 'text-gray-700 hover:text-primary'
     }`;
   };
 
   return (
-    <div className="flex items-center space-x-6"> {/* Added space-x-6 to create gaps */}
+    <div className="flex items-center space-x-6">
       <Link
         to="/"
         className={linkClasses('/')}
@@ -63,7 +63,7 @@ const NavLinks: React.FC<NavLinksProps> = ({
       </Link>
       {!isPremium && (
         <Link
-          to="/premium"
+          to="/premium-features"
           className={isMobileView 
             ? "px-2 py-2 rounded-md text-primary flex items-center" 
             : "font-medium text-primary flex items-center"}

@@ -1,442 +1,192 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Layout from '../components/Layout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Send, 
-  MoreHorizontal, 
-  Phone, 
-  Video, 
-  Bot, 
-  User, 
-  Info, 
-  ArrowRight, 
-  MessageSquare, 
-  CheckCircle, 
-  Mail, 
-  Clock 
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'user' | 'agent' | 'bot';
-  timestamp: Date;
-  status?: 'sent' | 'delivered' | 'read';
-}
+import React from 'react';
+import { Mail, Clock, CheckCircle } from 'lucide-react';
+import Layout from '@/components/Layout';
 
-const aiResponses = [
-  "Thanks for reaching out! I'd be happy to help with your travel planning.",
-  "Great question! Based on your preferences, I'd recommend visiting early morning or late afternoon to avoid crowds.",
-  "The best time to visit that destination would be during weekdays, especially Tuesday to Thursday.",
-  "Our premium subscription offers exclusive access to crowd predictions, priority customer support, and special discounts on bookings.",
-  "You can modify your booking up to 48 hours before your scheduled visit without any cancellation fee.",
-  "Would you like me to recommend some less crowded alternatives to that popular destination?",
-  "I'll check the current crowd levels at that location for you. One moment please...",
-  "Based on our data, crowd levels are predicted to be lowest between 9-10 AM and after 4 PM for that destination."
-];
-
-const agentResponses = [
-  "Hello! I'm Priya from Zenway Travels customer support. How can I assist you today?",
-  "I understand your concern. Let me check your booking details right away.",
-  "I've updated your reservation to reflect the new dates. You'll receive a confirmation email shortly.",
-  "We can definitely arrange for a guide who speaks that language. Let me make a note in your booking.",
-  "I've checked with our operations team, and they've confirmed that special accommodation is available.",
-  "Thank you for your patience. I've been able to process your refund, which should appear in your account within 3-5 business days."
-];
-
-const Support: React.FC = () => {
-  const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('ai-assistant');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [agentMessages, setAgentMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [agentInput, setAgentInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [agentIsTyping, setAgentIsTyping] = useState(false);
-  const [agentOnline, setAgentOnline] = useState(false);
-  const [agentResponseTime, setAgentResponseTime] = useState(3);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const agentMessagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
-    agentMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [agentMessages]);
-
-  useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([
-        {
-          id: '1',
-          text: "Hi there! I'm Travelbot, your AI assistant for all things travel. How can I help you today?",
-          sender: 'bot',
-          timestamp: new Date()
-        }
-      ]);
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    const checkAgentAvailability = () => {
-      const isAvailable = Math.random() > 0.3;
-      setAgentOnline(isAvailable);
-      setAgentResponseTime(Math.floor(Math.random() * 5) + 1);
-    };
-    
-    checkAgentAvailability();
-    const interval = setInterval(checkAgentAvailability, 30000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (agentMessages.length === 0) {
-      setAgentMessages([
-        {
-          id: '1',
-          text: "Welcome to Zenway Travels live support. Please share your query and an agent will assist you shortly.",
-          sender: 'agent',
-          timestamp: new Date()
-        }
-      ]);
-    }
-  }, [agentMessages]);
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim() === '') return;
-    
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: input,
-      sender: 'user',
-      timestamp: new Date(),
-      status: 'sent'
-    };
-    
-    setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    
-    setIsTyping(true);
-    
-    setTimeout(() => {
-      const botResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: botResponse,
-        sender: 'bot',
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 1500);
-  };
-
-  const handleSendAgentMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (agentInput.trim() === '') return;
-    
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: agentInput,
-      sender: 'user',
-      timestamp: new Date(),
-      status: 'sent'
-    };
-    
-    setAgentMessages(prev => [...prev, userMessage]);
-    setAgentInput('');
-    
-    if (agentOnline) {
-      setAgentIsTyping(true);
-      
-      setTimeout(() => {
-        const agentResponse = agentResponses[Math.floor(Math.random() * agentResponses.length)];
-        
-        const agentMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: agentResponse,
-          sender: 'agent',
-          timestamp: new Date()
-        };
-        
-        setAgentMessages(prev => [...prev, agentMessage]);
-        setAgentIsTyping(false);
-      }, 2000);
-    } else {
-      setTimeout(() => {
-        const agentMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: "Thank you for your message. Our team will get back to you as soon as possible. Current response time is approximately " + agentResponseTime + " minutes.",
-          sender: 'agent',
-          timestamp: new Date()
-        };
-        
-        setAgentMessages(prev => [...prev, agentMessage]);
-      }, 1000);
-    }
-  };
-
+const Support = () => {
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold">Customer Support</h1>
-              <p className="text-gray-600 mt-1">We're here to help with all your travel needs</p>
+          <h1 className="text-3xl font-bold mb-6">Customer Support</h1>
+          
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-2xl font-semibold mb-4">How Can We Help You?</h2>
+            <p className="text-gray-600 mb-6">
+              We're here to help with any questions or issues you may have about Zenway Travels. 
+              Browse through our FAQ section or contact us directly.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gray-50 p-4 rounded-md">
+                <h3 className="font-medium mb-2">Contact Support Team</h3>
+                <p className="text-sm text-gray-600">
+                  Our support team is available 24/7 to assist you with any questions or concerns.
+                </p>
+                <div className="mt-4 flex items-center">
+                  <Mail className="h-5 w-5 text-primary mr-2" />
+                  <span className="text-sm">support@zenway.com</span>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 p-4 rounded-md">
+                <h3 className="font-medium mb-2">Support Hours</h3>
+                <p className="text-sm text-gray-600">
+                  We're available to assist you during the following hours:
+                </p>
+                <div className="mt-4 flex items-center">
+                  <Clock className="h-5 w-5 text-primary mr-2" />
+                  <span className="text-sm">24/7, 365 days a year</span>
+                </div>
+              </div>
+            </div>
+            
+            <h3 className="text-xl font-semibold mb-4">Frequently Asked Questions</h3>
+            
+            <div className="space-y-4">
+              <div className="border-b pb-4">
+                <div className="flex items-start">
+                  <div className="mr-3 mt-1">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">How do I cancel my booking?</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      You can cancel your booking by going to "My Bookings" in your account and selecting the booking you wish to cancel. Follow the cancellation instructions and review our refund policy for more details.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-b pb-4">
+                <div className="flex items-start">
+                  <div className="mr-3 mt-1">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">What is the Premium membership?</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Premium membership gives you access to exclusive benefits such as priority booking, special discounts, and personalized travel recommendations. Visit our Premium page for more information.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-b pb-4">
+                <div className="flex items-start">
+                  <div className="mr-3 mt-1">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">How accurate are your crowd predictions?</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Our crowd predictions are based on historical data, current bookings, and real-time information from our partners. While we strive for accuracy, predictions can change due to unexpected events or weather conditions.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-b pb-4">
+                <div className="flex items-start">
+                  <div className="mr-3 mt-1">
+                    <CheckCircle className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Can I modify my travel dates after booking?</h4>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Yes, you can modify your travel dates up to 72 hours before your scheduled departure, subject to availability and potential price differences. Visit "My Bookings" in your account to make changes.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           
-          <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-2 mb-6">
-              <TabsTrigger value="ai-assistant" className="flex items-center">
-                <Bot className="mr-2 h-4 w-4" /> AI Assistant
-              </TabsTrigger>
-              <TabsTrigger value="live-support" className="flex items-center">
-                <MessageSquare className="mr-2 h-4 w-4" /> Live Support
-                {agentOnline && <Badge className="ml-2 bg-green-500">Online</Badge>}
-              </TabsTrigger>
-            </TabsList>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-2xl font-semibold mb-4">Contact Us</h2>
+            <p className="text-gray-600 mb-6">
+              If you couldn't find the answer to your question, please fill out the form below and we'll get back to you as soon as possible.
+            </p>
             
-            <TabsContent value="ai-assistant" className="space-y-4">
-              <Card className="border border-gray-200">
-                <CardHeader className="border-b bg-gray-50 p-4">
-                  <div className="flex items-center">
-                    <Avatar className="h-10 w-10 mr-3">
-                      <AvatarImage src="/placeholder.svg" />
-                      <AvatarFallback className="bg-primary text-white">AI</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-lg">Travel Assistant</CardTitle>
-                      <p className="text-sm text-gray-500">AI-powered support</p>
-                    </div>
-                    <Badge className="ml-auto bg-green-500">Online</Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="p-0">
-                  <div className="h-[500px] overflow-y-auto p-4 space-y-4">
-                    {messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[75%] rounded-lg p-3 ${
-                            message.sender === 'user'
-                              ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          <p>{message.text}</p>
-                          <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/60' : 'text-gray-500'}`}>
-                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    {isTyping && (
-                      <div className="flex justify-start">
-                        <div className="max-w-[75%] rounded-lg p-3 bg-gray-100">
-                          <div className="flex space-x-1">
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.2s]"></div>
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.4s]"></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                </CardContent>
-                
-                <CardFooter className="border-t p-3">
-                  <form onSubmit={handleSendMessage} className="flex w-full space-x-2">
-                    <Input
-                      placeholder="Type your message..."
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      className="flex-grow"
-                    />
-                    <Button type="submit">
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </CardFooter>
-              </Card>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Popular Questions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm">
-                    <ul className="space-y-1">
-                      <li className="text-primary hover:underline cursor-pointer">How do I cancel my booking?</li>
-                      <li className="text-primary hover:underline cursor-pointer">What is your refund policy?</li>
-                      <li className="text-primary hover:underline cursor-pointer">How accurate are the crowd predictions?</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-                
-                <Card className="col-span-2">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">AI Assistant Capabilities</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm">
-                    <p>Our AI assistant can help with:</p>
-                    <ul className="mt-2 space-y-1">
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        Booking information and modifications
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        Crowd prediction inquiries
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        Destination recommendations
-                      </li>
-                      <li className="flex items-center">
-                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
-                        Travel planning assistance
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="live-support" className="space-y-4">
-              <Card className="border border-gray-200">
-                <CardHeader className="border-b bg-gray-50 p-4">
-                  <div className="flex items-center">
-                    <Avatar className="h-10 w-10 mr-3">
-                      <AvatarImage src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" />
-                      <AvatarFallback className="bg-primary">CS</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <CardTitle className="text-lg">Customer Support</CardTitle>
-                      <p className="text-sm text-gray-500">
-                        {agentOnline 
-                          ? 'Agent online - Typical response time: <1 min' 
-                          : `Agents busy - Response time: ~${agentResponseTime} min`}
-                      </p>
-                    </div>
-                    <Badge className={`ml-auto ${agentOnline ? 'bg-green-500' : 'bg-amber-500'}`}>
-                      {agentOnline ? 'Online' : 'Busy'}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                
-                <CardContent className="p-0">
-                  <div className="h-[500px] overflow-y-auto p-4 space-y-4">
-                    {agentMessages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[75%] rounded-lg p-3 ${
-                            message.sender === 'user'
-                              ? 'bg-primary text-white'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          <p>{message.text}</p>
-                          <p className={`text-xs mt-1 ${message.sender === 'user' ? 'text-white/60' : 'text-gray-500'}`}>
-                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    {agentIsTyping && (
-                      <div className="flex justify-start">
-                        <div className="max-w-[75%] rounded-lg p-3 bg-gray-100">
-                          <div className="flex space-x-1">
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.2s]"></div>
-                            <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:0.4s]"></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={agentMessagesEndRef} />
-                  </div>
-                </CardContent>
-                
-                <CardFooter className="border-t p-3">
-                  <form onSubmit={handleSendAgentMessage} className="flex w-full space-x-2">
-                    <Input
-                      placeholder="Type your message..."
-                      value={agentInput}
-                      onChange={(e) => setAgentInput(e.target.value)}
-                      className="flex-grow"
-                    />
-                    <Button type="submit">
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </CardFooter>
-              </Card>
-              
+            <form className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Contact Methods</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm">
-                    <div className="space-y-2">
-                      <p className="flex items-center">
-                        <Phone className="h-4 w-4 mr-2 text-primary" />
-                        Call us: +91 1800-200-3000
-                      </p>
-                      <p className="flex items-center">
-                        <Mail className="h-4 w-4 mr-2 text-primary" />
-                        Email: help@zenwaytravels.com
-                      </p>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        <Phone className="h-4 w-4 mr-2" /> Request Callback
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Your name"
+                  />
+                </div>
                 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Support Hours</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm">
-                    <p className="flex items-center">
-                      <Clock className="h-4 w-4 mr-2 text-primary" />
-                      Live Chat: 24/7
-                    </p>
-                    <p className="flex items-center mt-1">
-                      <Phone className="h-4 w-4 mr-2 text-primary" />
-                      Phone Support: 9AM - 7PM IST (Mon-Sat)
-                    </p>
-                  </CardContent>
-                </Card>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Your email"
+                  />
+                </div>
               </div>
-            </TabsContent>
-          </Tabs>
+              
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Subject of your inquiry"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  rows={5}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="How can we help you?"
+                ></textarea>
+              </div>
+              
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="terms"
+                    type="checkbox"
+                    className="h-4 w-4 text-primary border-gray-300 rounded"
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="terms" className="text-gray-600">
+                    I agree to the <a href="#" className="text-primary">Terms of Service</a> and <a href="#" className="text-primary">Privacy Policy</a>
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <button
+                  type="submit"
+                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Send Message
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 

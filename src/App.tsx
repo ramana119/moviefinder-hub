@@ -25,7 +25,7 @@ import { BookingProvider } from './context/BookingContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from './components/ui/toaster';
 import RouteGuard from './components/RouteGuard';
-import './App.css';
+import Layout from './components/Layout';
 
 function App() {
   return (
@@ -37,17 +37,25 @@ function App() {
               <Router>
                 <Routes>
                   {/* Public Routes */}
-                  <Route path="/" element={<Index />} />
-                  <Route path="/destinations" element={<Destinations />} />
-                  <Route path="/destinations/:id" element={<DestinationDetail />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/signup" element={<Signup />} />
-                  <Route path="/support" element={<Support />} />
-                  <Route path="/premium-features" element={<PremiumFeatures />} />
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/destinations" element={<Destinations />} />
+                    <Route path="/destinations/:id" element={<DestinationDetail />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/support" element={<Support />} />
+                    <Route path="/premium-features" element={<PremiumFeatures />} />
+                  </Route>
                   
                   {/* Protected Routes */}
-                  <Route element={<RouteGuard requireAuth={true}><Outlet /></RouteGuard>}>
+                  <Route element={
+                    <RouteGuard requireAuth={true}>
+                      <Layout>
+                        <Outlet />
+                      </Layout>
+                    </RouteGuard>
+                  }>
                     <Route path="/bookings" element={<MyBookings />} />
                     <Route path="/bookings/:id" element={<BookingDetails />} />
                     <Route path="/profile" element={<Profile />} />

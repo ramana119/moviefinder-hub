@@ -24,7 +24,6 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <NavLogo />
-              <span className="ml-2 text-xl font-bold tracking-tight">Zenway Travels</span>
             </Link>
           </div>
 
@@ -71,28 +70,18 @@ const Navbar = () => {
           <div className="container mx-auto px-4 py-3">
             <div className="flex flex-col space-y-2">
               <div className="py-2">
-                <NavLinks />
+                <NavLinks isMobileView={true} onItemClick={() => setIsMenuOpen(false)} />
               </div>
               <div className="pt-2 border-t">
                 {currentUser ? (
-                  <div className="py-2">
-                    <Link to="/profile" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                      My Profile
-                    </Link>
-                    <Link to="/my-bookings" className="block px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">
-                      My Bookings
-                    </Link>
-                    <button className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500">
-                      Logout
-                    </button>
-                  </div>
+                  <NavUserMenu isMobileView={true} onItemClick={() => setIsMenuOpen(false)} />
                 ) : (
                   <div className="flex flex-col space-y-2 py-2">
                     <Button className="w-full" asChild>
-                      <Link to="/signup">Sign Up</Link>
+                      <Link to="/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
                     </Button>
                     <Button variant="outline" className="w-full" asChild>
-                      <Link to="/login">Login</Link>
+                      <Link to="/login" onClick={() => setIsMenuOpen(false)}>Login</Link>
                     </Button>
                   </div>
                 )}
