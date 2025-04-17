@@ -395,34 +395,41 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
     
     if (selectedHotels.length > 0) {
-      if (options.travelStyle === 'base-hotel' && options.destinationIds.length === 1) {
-        hotelCostPerDay = selectedHotels[0].pricePerPerson;
-      } else if (options.travelStyle === 'base-hotel' && options.destinationIds.length > 1) {
-        const cheapestHotels = options.destinationIds.map(destId => {
-          const destHotels = hotels.filter(h => h.destinationId === destId && h.type === options.hotelType);
-          return destHotels.sort((a, b) => a.pricePerPerson - b.pricePerPerson)[0];
-        }).filter(Boolean);
-        
-        if (cheapestHotels.length > 0) {
-          hotelCostPerDay = cheapestHotels.reduce((sum, h) => sum + h.pricePerPerson, 0) / cheapestHotels.length;
-        }
+      const baseCosts = {
+        'budget': 1000,
+        'standard': 2500,
+        'luxury': 5000
+      };
+      
+      if (options.destinationIds.length === 1) {
+        hotelCostPerDay = baseCosts[options.hotelType];
+      } else if (options.travelStyle === 'base-hotel') {
+        hotelCostPerDay = baseCosts[options.hotelType] * 1.1;
       } else if (options.travelStyle === 'mobile') {
-        hotelCostPerDay = (selectedHotels.reduce((sum, h) => sum + h.pricePerPerson, 0) / selectedHotels.length) * 
-          (options.destinationIds.length > 1 ? 1.15 : 1);
+        hotelCostPerDay = baseCosts[options.hotelType] * 1.2 * options.destinationIds.length;
+      }
+      
+      if (hotelCostPerDay === 0 && selectedHotels.length > 0) {
+        hotelCostPerDay = selectedHotels.reduce((sum, h) => sum + h.pricePerPerson, 0) / selectedHotels.length;
       }
     }
     
     const hotelsCost = hotelCostPerDay * options.numberOfPeople * options.numberOfDays;
     
-    const baseTransportCost = transports
-      .filter(t => t.type === options.transportType)
-      .reduce((sum, t) => sum + t.pricePerPerson, 0) / 
-      (transports.filter(t => t.type === options.transportType).length || 1);
+    const transportMultipliers = {
+      'bus': 1,
+      'train': 1.5,
+      'flight': 3,
+      'car': 1.2
+    };
     
-    const transportMultiplier = options.destinationIds.length > 1 ? 
+    const baseTransportCost = 500;
+    
+    const distanceMultiplier = options.destinationIds.length > 1 ? 
       (options.destinationIds.length - 1) * 0.8 : 1;
     
-    const transportCost = baseTransportCost * options.numberOfPeople * transportMultiplier;
+    const transportCost = baseTransportCost * transportMultipliers[options.transportType] * 
+      options.numberOfPeople * distanceMultiplier;
     
     const guidesCost = guides
       .filter(g => options.guideIds.includes(g.id))
@@ -435,7 +442,7 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       guidesCost,
       totalCost: destinationsCost + hotelsCost + transportCost + guidesCost
     };
-  }, [destinations]);
+  }, [destinations, guides]);
 
   const checkTripFeasibility = useCallback((options: {
     destinationIds: string[];
