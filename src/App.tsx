@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
 import Index from './pages/Index';
 import Destinations from './pages/Destinations';
 import DestinationDetail from './pages/DestinationDetail';
@@ -47,7 +46,7 @@ function App() {
                   <Route path="/premium-features" element={<PremiumFeatures />} />
                   
                   {/* Protected Routes */}
-                  <Route element={<RouteGuard>{/* This adds the children prop */}</RouteGuard>}>
+                  <Route element={<RouteGuard requireAuth={true}><Outlet /></RouteGuard>}>
                     <Route path="/bookings" element={<MyBookings />} />
                     <Route path="/bookings/:id" element={<BookingDetails />} />
                     <Route path="/profile" element={<Profile />} />
