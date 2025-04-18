@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   DropdownMenu,
@@ -13,9 +13,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Settings, CalendarDays, Star } from 'lucide-react';
+import { LogOut, User, Settings, CalendarDays, Star, Map, MapPin } from 'lucide-react';
 
-const NavUserMenu: React.FC = () => {
+interface NavUserMenuProps {
+  isMobileView?: boolean;
+  onItemClick?: () => void;
+}
+
+const NavUserMenu: React.FC<NavUserMenuProps> = ({ 
+  isMobileView = false,
+  onItemClick = () => {}
+}) => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
   
@@ -33,6 +41,43 @@ const NavUserMenu: React.FC = () => {
     .join('')
     .toUpperCase();
   
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    if (onItemClick) onItemClick();
+  };
+
+  if (isMobileView) {
+    return (
+      <>
+        <Link
+          to="/trip-planner"
+          className="px-2 py-2 rounded-md text-gray-700"
+          onClick={onItemClick}
+        >
+          <Map className="h-4 w-4 inline mr-1" />
+          Plan Your Trip
+        </Link>
+        <Link
+          to="/bookings"
+          className="px-2 py-2 rounded-md text-gray-700"
+          onClick={onItemClick}
+        >
+          <MapPin className="h-4 w-4 inline mr-1" />
+          My Bookings
+        </Link>
+        <button
+          onClick={handleLogout}
+          className="px-2 py-2 text-left rounded-md text-gray-700 w-full"
+        >
+          <LogOut className="h-4 w-4 inline mr-1" />
+          Log Out
+        </button>
+      </>
+    );
+  }
+  
+  // Desktop view
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,20 +100,29 @@ const NavUserMenu: React.FC = () => {
           <p className="font-medium">{userName}</p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/profile')}>
+        <DropdownMenuItem onClick={() => {
+          navigate('/profile');
+          if (onItemClick) onItemClick();
+        }}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/bookings')}>
+        <DropdownMenuItem onClick={() => {
+          navigate('/bookings');
+          if (onItemClick) onItemClick();
+        }}>
           <CalendarDays className="mr-2 h-4 w-4" />
           <span>My Bookings</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/profile#settings')}>
+        <DropdownMenuItem onClick={() => {
+          navigate('/profile#settings');
+          if (onItemClick) onItemClick();
+        }}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => logout()}>
+        <DropdownMenuItem onClick={handleLogout}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Logout</span>
         </DropdownMenuItem>
