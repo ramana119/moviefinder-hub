@@ -32,8 +32,8 @@ function App() {
     <AuthProvider>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
         <DestinationProvider>
-          <TripPlanningProvider>
-            <BookingProvider>
+          <BookingProvider>
+            <TripPlanningProvider>
               <Router>
                 <Routes>
                   {/* Public Routes */}
@@ -71,8 +71,8 @@ function App() {
                 </Routes>
                 <Toaster />
               </Router>
-            </BookingProvider>
-          </TripPlanningProvider>
+            </TripPlanningProvider>
+          </BookingProvider>
         </DestinationProvider>
       </ThemeProvider>
     </AuthProvider>
