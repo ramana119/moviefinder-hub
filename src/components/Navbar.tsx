@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '../context/AuthContext';
-import NavLinks from './navabar/NavLinks';
-import NavLogo from './navabar/NavLogo';
-import NavUserMenu from './navabar/NavUserMenu';
+import NavLinks from './navbar/NavLinks';
+import NavLogo from './navbar/NavLogo';
+import NavUserMenu from './navbar/NavUserMenu';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
