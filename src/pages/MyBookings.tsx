@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useBookings } from '../context/BookingContext';
@@ -186,10 +185,10 @@ const TripPlanItem: React.FC<{ tripPlan: any }> = ({ tripPlan }) => {
           
           <div className="mt-4 flex justify-end">
             <Button asChild variant="outline" size="sm" className="mr-2">
-              <Link to={`/bookings/${tripPlan.id}`}>View Trip</Link>
+              <Link to={`/trip-plans/${tripPlan.id}`}>View Trip</Link>
             </Button>
             <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700 hover:bg-red-50">
-              Delete
+              <Link to={`/trip-plans/${tripPlan.id}`}>Cancel Trip</Link>
             </Button>
           </div>
         </div>

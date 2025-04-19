@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Outlet } from 'react-router-dom';
 import Index from './pages/Index';
@@ -26,6 +25,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from './components/ui/toaster';
 import RouteGuard from './components/RouteGuard';
 import Layout from './components/Layout';
+import TripPlanDetails from './pages/TripPlanDetails';
 
 function App() {
   return (
@@ -69,6 +69,7 @@ function App() {
                   }>
                     <Route path="/bookings" element={<MyBookings />} />
                     <Route path="/bookings/:id" element={<BookingDetails />} />
+                    <Route path="/trip-plans/:id" element={<TripPlanDetails />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/premium-success" element={<PremiumSuccess />} />
                     <Route path="/trip-planner" element={<TripPlanner />} />
