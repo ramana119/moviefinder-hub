@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
@@ -347,102 +348,6 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
   }, [getDistanceMatrix]);
 
-  const saveTripPlan = useCallback(async (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>): Promise<string> => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      if (!tripPlanData.selectedDestinations?.length) {
-        throw new Error('At least one destination is required');
-      }
-
-      const newTripPlanId = `trip_${uuidv4()}`;
-      const transportType = tripPlanData.transportType || 'car';
-      
-      let optimalHotels: HotelType[] = [];
-      
-      try {
-        optimalHotels = getOptimalHotels(tripPlanData.selectedDestinations);
-      } catch (hotelErr) {
-        console.error('Error finding optimal hotels:', hotelErr);
-        setError('Failed to find optimal hotels');
-      }
-      
-      let itinerary: TripItineraryDay[] = [];
-      
-      try {
-        itinerary = generateOptimalItinerary({
-          destinationIds: tripPlanData.selectedDestinations,
-          transportType,
-          numberOfDays: tripPlanData.numberOfDays,
-          startDate: new Date(tripPlanData.startDate),
-          travelStyle: tripPlanData.travelStyle,
-          isPremium: tripPlanData.isPremium
-        });
-      } catch (itineraryErr) {
-        console.error('Error generating itinerary:', itineraryErr);
-        setError('Failed to generate itinerary');
-        const startDate = new Date(tripPlanData.startDate);
-        itinerary = tripPlanData.selectedDestinations.map((destId, idx) => {
-          const dest = destinations.find(d => d.id === destId);
-          const day = idx + 1;
-          const date = new Date(startDate);
-          date.setDate(startDate.getDate() + idx);
-          
-          return {
-            day,
-            date,
-            destinationId: destId,
-            destinationName: dest?.name || 'Unknown Destination',
-            activities: ['Explore the area'],
-            isTransitDay: false,
-            detailedSchedule: [
-              { time: '09:00', activity: 'Sightseeing', location: dest?.name || 'Unknown' }
-            ],
-            hotels: [destId]
-          };
-        });
-      }
-      
-      const avgProximityScore = optimalHotels.length > 0
-        ? optimalHotels.reduce((sum, hotel) => 
-            sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / optimalHotels.length
-        : 5; // Default mid-range score if no hotels
-
-      const newTripPlan: TripPlan = {
-        ...tripPlanData,
-        id: newTripPlanId,
-        createdAt: new Date().toISOString(),
-        transportType,
-        itinerary,
-        hotelProximityScore: avgProximityScore,
-        selectedHotels: optimalHotels.map(hotel => hotel.id),
-        status: 'confirmed' // Set status to confirmed
-      };
-
-      setTripPlans(prev => [...prev, newTripPlan]);
-      await saveBookingTripPlan(newTripPlan);
-      
-      toast({
-        title: 'Trip Plan Saved!',
-        description: 'Your trip plan has been created successfully.',
-      });
-
-      return newTripPlanId;
-    } catch (err) {
-      const errorMsg = (err as Error).message || 'Failed to create trip plan';
-      setError(errorMsg);
-      toast({
-        title: 'Trip Planning Failed',
-        description: errorMsg,
-        variant: 'destructive',
-      });
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [getOptimalHotels, generateOptimalItinerary, saveBookingTripPlan, toast, destinations]);
-
   // Improved function to generate logical itinerary that doesn't have repetitive destinations
   const generateOptimalItinerary = useCallback((options: {
     destinationIds: string[];
@@ -451,6 +356,7 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     startDate: Date;
     travelStyle?: 'base-hotel' | 'mobile';
     isPremium?: boolean;
+    hotelType?: 'budget' | 'standard' | 'luxury';
   }): TripItineraryDay[] => {
     const selectedDestinations = options.destinationIds
       .map(id => destinations.find(dest => dest.id === id))
@@ -603,6 +509,103 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     
     return itinerary;
   }, [destinations, getDistanceMatrix, getTransportAmenities, getNearbyHotels]);
+
+  const saveTripPlan = useCallback(async (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>): Promise<string> => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (!tripPlanData.selectedDestinations?.length) {
+        throw new Error('At least one destination is required');
+      }
+
+      const newTripPlanId = `trip_${uuidv4()}`;
+      const transportType = tripPlanData.transportType || 'car';
+      
+      let optimalHotels: HotelType[] = [];
+      
+      try {
+        optimalHotels = getOptimalHotels(tripPlanData.selectedDestinations);
+      } catch (hotelErr) {
+        console.error('Error finding optimal hotels:', hotelErr);
+        setError('Failed to find optimal hotels');
+      }
+      
+      let itinerary: TripItineraryDay[] = [];
+      
+      try {
+        itinerary = generateOptimalItinerary({
+          destinationIds: tripPlanData.selectedDestinations,
+          transportType,
+          numberOfDays: tripPlanData.numberOfDays,
+          startDate: new Date(tripPlanData.startDate),
+          travelStyle: tripPlanData.travelStyle,
+          isPremium: tripPlanData.isPremium,
+          hotelType: tripPlanData.hotelType
+        });
+      } catch (itineraryErr) {
+        console.error('Error generating itinerary:', itineraryErr);
+        setError('Failed to generate itinerary');
+        const startDate = new Date(tripPlanData.startDate);
+        itinerary = tripPlanData.selectedDestinations.map((destId, idx) => {
+          const dest = destinations.find(d => d.id === destId);
+          const day = idx + 1;
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + idx);
+          
+          return {
+            day,
+            date,
+            destinationId: destId,
+            destinationName: dest?.name || 'Unknown Destination',
+            activities: ['Explore the area'],
+            isTransitDay: false,
+            detailedSchedule: [
+              { time: '09:00', activity: 'Sightseeing', location: dest?.name || 'Unknown' }
+            ],
+            hotels: [destId]
+          };
+        });
+      }
+      
+      const avgProximityScore = optimalHotels.length > 0
+        ? optimalHotels.reduce((sum, hotel) => 
+            sum + (hotel.location ? hotel.location.proximityScore : 0), 0) / optimalHotels.length
+        : 5; // Default mid-range score if no hotels
+
+      const newTripPlan: TripPlan = {
+        ...tripPlanData,
+        id: newTripPlanId,
+        createdAt: new Date().toISOString(),
+        transportType,
+        itinerary,
+        hotelProximityScore: avgProximityScore,
+        selectedHotels: optimalHotels.map(hotel => hotel.id),
+        status: 'confirmed' // Set status to confirmed
+      };
+
+      setTripPlans(prev => [...prev, newTripPlan]);
+      await saveBookingTripPlan(newTripPlan);
+      
+      toast({
+        title: 'Trip Plan Saved!',
+        description: 'Your trip plan has been created successfully.',
+      });
+
+      return newTripPlanId;
+    } catch (err) {
+      const errorMsg = (err as Error).message || 'Failed to create trip plan';
+      setError(errorMsg);
+      toast({
+        title: 'Trip Planning Failed',
+        description: errorMsg,
+        variant: 'destructive',
+      });
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, [getOptimalHotels, generateOptimalItinerary, saveBookingTripPlan, toast, destinations]);
 
   const getUserTripPlans = useCallback((userId: string) => {
     return tripPlans.filter(plan => plan.userId === userId);

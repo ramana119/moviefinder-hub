@@ -39,7 +39,7 @@ const NotFound = () => {
           <p className="text-xl text-gray-600 mb-6">Oops! Page not found</p>
           
           {isAuthenticated && currentUser && !currentUser.profileComplete && (
-            <Alert variant="warning" className="mb-6">
+            <Alert variant="destructive" className="mb-6">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Profile Incomplete</AlertTitle>
               <AlertDescription>
