@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDestinations } from '../context/DestinationContext';
@@ -11,7 +10,6 @@ import TripDistanceCalculator from '../components/TripDistanceCalculator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-// Import our new components
 import DestinationSelector from '../components/trip-planner/DestinationSelector';
 import DatePeoplePicker from '../components/trip-planner/DatePeoplePicker';
 import HotelTypeSelector from '../components/trip-planner/HotelTypeSelector';
@@ -54,21 +52,18 @@ const TripPlanner: React.FC = () => {
 
   const destinationIdFromParams = location.state?.destinationId;
 
-  // Initialize with destination from params if available
   useEffect(() => {
     if (destinationIdFromParams && !selectedDestinations.includes(destinationIdFromParams)) {
       setSelectedDestinations([destinationIdFromParams]);
     }
   }, [destinationIdFromParams, selectedDestinations]);
 
-  // Set premium status based on user
   useEffect(() => {
     if (currentUser?.isPremium) {
       setIsPremium(true);
     }
   }, [currentUser]);
 
-  // Calculate cost whenever relevant inputs change
   useEffect(() => {
     if (selectedDestinations.length > 0) {
       const cost = calculateTripCost({
@@ -79,17 +74,30 @@ const TripPlanner: React.FC = () => {
         numberOfDays,
         numberOfPeople
       });
-      setTotalCost(cost.totalCost);
+      
+      let adjustedTotalCost = cost.totalCost;
+      if (isPremium && selectedGuides.length > 0 && cost.guidesCost > 0) {
+        const cheapestGuide = guides
+          .filter(g => selectedGuides.includes(g.id))
+          .sort((a, b) => a.pricePerDay - b.pricePerDay)[0];
+          
+        if (cheapestGuide) {
+          adjustedTotalCost -= cheapestGuide.pricePerDay * numberOfDays;
+        }
+      }
+      
+      setTotalCost(adjustedTotalCost);
       setCostBreakdown({
         destinationsCost: cost.destinationsCost,
         hotelsCost: cost.hotelsCost,
         transportCost: cost.transportCost,
-        guidesCost: cost.guidesCost
+        guidesCost: isPremium && selectedGuides.length > 0 ? 
+          Math.max(0, cost.guidesCost - (guides.find(g => selectedGuides.includes(g.id))?.pricePerDay || 0) * numberOfDays) : 
+          cost.guidesCost
       });
     }
-  }, [selectedDestinations, selectedGuides, hotelType, transportType, numberOfDays, numberOfPeople, calculateTripCost]);
+  }, [selectedDestinations, selectedGuides, hotelType, transportType, numberOfDays, numberOfPeople, calculateTripCost, isPremium, guides]);
 
-  // Check trip feasibility
   useEffect(() => {
     if (selectedDestinations.length > 0) {
       const feasibility = checkTripFeasibility({
@@ -102,7 +110,6 @@ const TripPlanner: React.FC = () => {
     }
   }, [selectedDestinations, transportType, numberOfDays, checkTripFeasibility]);
 
-  // Get suggested transport
   useEffect(() => {
     if (selectedDestinations.length > 1) {
       const suggested = getSuggestedTransport(selectedDestinations, numberOfDays, isPremium);
@@ -149,7 +156,6 @@ const TripPlanner: React.FC = () => {
 
   const handleSuggestTransport = (suggestedType: 'bus' | 'train' | 'flight' | 'car') => {
     setTransportType(suggestedType);
-    // Also select a default transport of this type
     const defaultTransport = transports.find(t => t.type === suggestedType);
     if (defaultTransport) {
       setSelectedTransport(defaultTransport.id);
@@ -161,7 +167,7 @@ const TripPlanner: React.FC = () => {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
     if (selectedDestinations.length === 0) {
       toast({
         title: "Destination Required",
@@ -197,7 +203,7 @@ const TripPlanner: React.FC = () => {
         transportType,
         guideIds: selectedGuides,
         totalCost,
-        status: 'planning' as const,
+        status: 'confirmed' as const,
         isPremium,
         sleepTransport,
         travelStyle
@@ -246,7 +252,6 @@ const TripPlanner: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Planning Form */}
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid grid-cols-5 mb-4">
@@ -390,7 +395,6 @@ const TripPlanner: React.FC = () => {
             </Tabs>
           </div>
 
-          {/* Trip Summary */}
           <div className="lg:col-span-1">
             <TripCostBreakdown 
               selectedDestinations={selectedDestinations}

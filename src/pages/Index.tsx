@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -12,7 +11,6 @@ import DestinationCard from '../components/DestinationCard';
 const Index: React.FC = () => {
   const { filteredDestinations, loading } = useDestinations();
   
-  // Get featured destinations (low crowd levels first, then highly rated)
   const featuredDestinations = React.useMemo(() => {
     if (!filteredDestinations.length) return [];
     
@@ -23,7 +21,6 @@ const Index: React.FC = () => {
 
   return (
     <Layout>
-      {/* Hero Section with parallax effect */}
       <section 
         className="relative py-20 sm:py-32 overflow-hidden bg-cover bg-center" 
         style={{ 
@@ -57,7 +54,7 @@ const Index: React.FC = () => {
                 variant="outline" 
                 asChild 
                 size="lg"
-                className="px-8 text-white border-white hover:bg-white/20"
+                className="px-8 text-white border-white hover:bg-white/20 bg-black/30"
               >
                 <Link to="/trip-planner">Plan Your Trip</Link>
               </Button>
@@ -66,7 +63,6 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* Featured Destinations */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
@@ -99,7 +95,6 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
@@ -152,7 +147,6 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-12 text-center">
@@ -233,7 +227,6 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* Chat Support Banner */}
       <section className="py-10 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="bg-primary rounded-xl p-8 flex flex-col md:flex-row items-center justify-between">
@@ -254,7 +247,6 @@ const Index: React.FC = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-primary to-primary-dark text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">

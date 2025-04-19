@@ -46,6 +46,12 @@ function App() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/support" element={<Support />} />
                     <Route path="/premium-features" element={<PremiumFeatures />} />
+                    {/* Move profile completion to public routes but with auth guard */}
+                    <Route path="/complete-profile" element={
+                      <RouteGuard requireAuth={true}>
+                        <ProfileCompletion />
+                      </RouteGuard>
+                    } />
                   </Route>
                   
                   {/* Protected Routes */}
@@ -59,7 +65,6 @@ function App() {
                     <Route path="/bookings" element={<MyBookings />} />
                     <Route path="/bookings/:id" element={<BookingDetails />} />
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/complete-profile" element={<ProfileCompletion />} />
                     <Route path="/premium-success" element={<PremiumSuccess />} />
                     <Route path="/trip-planner" element={<TripPlanner />} />
                     <Route path="/booking/:destinationId" element={<Booking />} />

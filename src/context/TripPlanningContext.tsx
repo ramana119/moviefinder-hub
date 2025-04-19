@@ -218,37 +218,102 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const itinerary: TripItineraryDay[] = [];
     let currentDate = new Date(options.startDate);
     
-    for (let i = 0; i < options.numberOfDays; i++) {
-      const destIndex = i % selectedDestinations.length;
+    const daysPerDestination = Math.max(1, Math.floor(options.numberOfDays / selectedDestinations.length));
+    let remainingDays = options.numberOfDays - (daysPerDestination * selectedDestinations.length);
+
+    const extraDays = selectedDestinations.map((dest, index) => {
+      if (remainingDays > 0 && index < remainingDays) {
+        return 1;
+      }
+      return 0;
+    });
+
+    for (let destIndex = 0; destIndex < selectedDestinations.length; destIndex++) {
       const destination = selectedDestinations[destIndex];
+      const totalDaysAtThisDestination = daysPerDestination + extraDays[destIndex];
       
-      const detailedSchedule = [
-        { time: '08:00', activity: 'Breakfast', location: `Hotel in ${destination.name}` },
-        { time: '09:30', activity: `Explore ${destination.name}`, location: destination.name },
-        { time: '12:30', activity: 'Lunch', location: `Restaurant in ${destination.name}` },
-        { time: '14:00', activity: `Visit ${destination.attractions?.[0] || 'local attractions'}`, location: destination.name },
-        { time: '18:00', activity: 'Dinner', location: `Restaurant in ${destination.name}` }
-      ];
-      
-      itinerary.push({
-        day: i + 1,
-        date: new Date(currentDate),
-        destinationId: destination.id,
-        destinationName: destination.name,
-        activities: [
-          `Explore ${destination.name}`,
-          `Visit ${destination.attractions?.[0] || 'local attractions'}`
-        ],
-        isTransitDay: false,
-        detailedSchedule,
-        hotels: [destination.id]
-      });
-      
-      currentDate.setDate(currentDate.getDate() + 1);
+      for (let dayOffset = 0; dayOffset < totalDaysAtThisDestination; dayOffset++) {
+        const day = itinerary.length + 1;
+        const date = new Date(currentDate);
+        const hotelName = hotels.find(h => h.destinationId === destination.id)?.name || `Hotel in ${destination.name}`;
+
+        let activities;
+        if (dayOffset === 0) {
+          activities = [`Arrive and check-in at ${hotelName}`, `Explore ${destination.name}`];
+        } else if (dayOffset === totalDaysAtThisDestination - 1 && destIndex < selectedDestinations.length - 1) {
+          activities = [`Visit ${destination.attractions?.[dayOffset % (destination.attractions?.length || 1)] || 'local attractions'}`, `Prepare for departure to ${selectedDestinations[destIndex + 1].name}`];
+        } else {
+          activities = [
+            `Visit ${destination.attractions?.[dayOffset % (destination.attractions?.length || 1)] || 'local attractions'}`,
+            `Explore more of ${destination.name}`
+          ];
+        }
+
+        const detailedSchedule = [
+          { time: '08:00', activity: 'Breakfast', location: hotelName },
+          { time: '09:30', activity: activities[0], location: destination.name },
+          { time: '12:30', activity: 'Lunch', location: `Restaurant in ${destination.name}` },
+          { time: '14:00', activity: activities[1], location: destination.name },
+          { time: '18:00', activity: 'Dinner', location: `Restaurant in ${destination.name}` }
+        ];
+
+        itinerary.push({
+          day,
+          date,
+          destinationId: destination.id,
+          destinationName: destination.name,
+          activities,
+          isTransitDay: false,
+          detailedSchedule,
+          hotels: [destination.id]
+        });
+        
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      if (destIndex < selectedDestinations.length - 1) {
+        const nextDestination = selectedDestinations[destIndex + 1];
+        const distance = distanceMatrix.find(m => 
+          m.fromId === destination.id && m.toId === nextDestination.id
+        ) || distanceMatrix.find(m => 
+          m.fromId === destination.id || m.toId === nextDestination.id
+        );
+        
+        if (distance && distance.distanceKm > 100) {
+          const day = itinerary.length + 1;
+          const date = new Date(currentDate);
+
+          itinerary.push({
+            day,
+            date,
+            destinationId: nextDestination.id,
+            destinationName: `Travel from ${destination.name} to ${nextDestination.name}`,
+            activities: [`Travel to ${nextDestination.name}`],
+            isTransitDay: true,
+            departureTime: '09:00',
+            arrivalTime: '16:00',
+            transportDetails: {
+              vehicle: options.transportType,
+              duration: `${distance.travelTimesByTransport[options.transportType]} hours`,
+              amenities: getTransportAmenities(options.transportType, false)
+            },
+            detailedSchedule: [
+              { time: '07:00', activity: 'Breakfast and checkout', location: `Hotel in ${destination.name}` },
+              { time: '09:00', activity: `Depart for ${nextDestination.name}`, location: `${destination.name} ${options.transportType} station` },
+              { time: '12:00', activity: 'Lunch break', location: 'En route' },
+              { time: '16:00', activity: `Arrive at ${nextDestination.name}`, location: nextDestination.name },
+              { time: '18:00', activity: 'Check-in and dinner', location: `Hotel in ${nextDestination.name}` }
+            ],
+            hotels: [nextDestination.id]
+          });
+          
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
     }
     
     return itinerary;
-  }, [destinations, getDistanceMatrix]);
+  }, [destinations, getDistanceMatrix, getTransportAmenities, hotels]);
 
   const saveTripPlan = useCallback(async (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>): Promise<string> => {
     setError(null);
@@ -418,22 +483,23 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
     
     const transportMultipliers = {
       'bus': 1,
-      'train': 1.5,
-      'flight': 3,
-      'car': 1.2
+      'train': 2.5,
+      'flight': 5.0,
+      'car': 1.8
     };
     
-    const baseTransportCost = 500;
+    const distanceMatrix = getDistanceMatrix(options.destinationIds);
+    const totalDistance = distanceMatrix.reduce((sum, segment) => sum + segment.distanceKm, 0);
     
-    const distanceMultiplier = options.destinationIds.length > 1 ? 
-      (options.destinationIds.length - 1) * 0.8 : 1;
+    const baseTransportCost = 500 + (totalDistance * 0.5);
+    const transportCost = baseTransportCost * transportMultipliers[options.transportType] * options.numberOfPeople;
     
-    const transportCost = baseTransportCost * transportMultipliers[options.transportType] * 
-      options.numberOfPeople * distanceMultiplier;
+    let guidesCost = 0;
+    const selectedGuides = guides.filter(g => options.guideIds.includes(g.id));
     
-    const guidesCost = guides
-      .filter(g => options.guideIds.includes(g.id))
-      .reduce((sum, g) => sum + g.pricePerDay, 0) * options.numberOfDays;
+    if (selectedGuides.length > 0) {
+      guidesCost = selectedGuides.reduce((sum, g) => sum + g.pricePerDay, 0) * options.numberOfDays;
+    }
     
     return {
       destinationsCost,
@@ -442,7 +508,7 @@ export const TripPlanningProvider: React.FC<{ children: React.ReactNode }> = ({ 
       guidesCost,
       totalCost: destinationsCost + hotelsCost + transportCost + guidesCost
     };
-  }, [destinations, guides]);
+  }, [destinations, getDistanceMatrix, guides, hotels]);
 
   const checkTripFeasibility = useCallback((options: {
     destinationIds: string[];

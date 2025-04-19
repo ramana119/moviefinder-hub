@@ -46,7 +46,6 @@ const RouteGuard: React.FC<RouteGuardProps> = ({
   }, [isAuthenticated, requireAuth, currentUser, requireProfileComplete, isLoading, toast]);
 
   if (isLoading) {
-    // Improved loading state with spinner
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -58,16 +57,17 @@ const RouteGuard: React.FC<RouteGuardProps> = ({
   }
 
   if (requireAuth && !isAuthenticated) {
-    // Redirect to login if authentication is required but user is not authenticated
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  if (requireProfileComplete && isAuthenticated && currentUser && !currentUser.profileComplete) {
-    // Redirect to profile completion if required but profile is not complete
-    return <Navigate to="/profile-completion" state={{ from: location.pathname }} replace />;
+  // Fix: redirect to profile-completion after signup
+  if (isAuthenticated && currentUser && !currentUser.profileComplete && 
+      location.pathname !== '/complete-profile' && 
+      location.pathname !== '/signup' && 
+      location.pathname !== '/login') {
+    return <Navigate to="/complete-profile" state={{ from: location.pathname }} replace />;
   }
 
-  // If all checks pass, render the children
   return <>{children}</>;
 };
 
