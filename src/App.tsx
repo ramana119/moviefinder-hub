@@ -37,8 +37,8 @@ function App() {
               <Router>
                 <Routes>
                   {/* Public Routes */}
-                  <Route element={<Layout />}>
-                    <Route path="/" element={<Index />} />
+                  <Route path="/" element={<Layout />}>
+                    <Route index element={<Index />} />
                     <Route path="/destinations" element={<Destinations />} />
                     <Route path="/destinations/:id" element={<DestinationDetail />} />
                     <Route path="/about" element={<About />} />
@@ -46,17 +46,22 @@ function App() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/support" element={<Support />} />
                     <Route path="/premium-features" element={<PremiumFeatures />} />
-                    {/* Move profile completion to public routes but with auth guard */}
-                    <Route path="/complete-profile" element={
-                      <RouteGuard requireAuth={true}>
-                        <ProfileCompletion />
-                      </RouteGuard>
-                    } />
                   </Route>
                   
-                  {/* Protected Routes */}
+                  {/* Auth required but no profile completion required */}
                   <Route element={
                     <RouteGuard requireAuth={true}>
+                      <Layout>
+                        <Outlet />
+                      </Layout>
+                    </RouteGuard>
+                  }>
+                    <Route path="/complete-profile" element={<ProfileCompletion />} />
+                  </Route>
+                  
+                  {/* Protected Routes requiring both auth and profile completion */}
+                  <Route element={
+                    <RouteGuard requireAuth={true} requireProfileComplete={true}>
                       <Layout>
                         <Outlet />
                       </Layout>

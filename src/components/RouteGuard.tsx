@@ -60,11 +60,15 @@ const RouteGuard: React.FC<RouteGuardProps> = ({
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Fix: redirect to profile-completion after signup
-  if (isAuthenticated && currentUser && !currentUser.profileComplete && 
+  // Fix: better handling for profile completion redirect
+  if (isAuthenticated && 
+      currentUser && 
+      !currentUser.profileComplete && 
+      requireProfileComplete &&
       location.pathname !== '/complete-profile' && 
       location.pathname !== '/signup' && 
       location.pathname !== '/login') {
+    console.log(`Redirecting from ${location.pathname} to /complete-profile`);
     return <Navigate to="/complete-profile" state={{ from: location.pathname }} replace />;
   }
 

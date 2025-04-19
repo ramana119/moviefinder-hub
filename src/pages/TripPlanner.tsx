@@ -4,7 +4,6 @@ import { useDestinations } from '../context/DestinationContext';
 import { useTripPlanning } from '../context/TripPlanningContext';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../hooks/use-toast';
-import Layout from '../components/Layout';
 import TripValidation from '../components/TripValidation';
 import TripDistanceCalculator from '../components/TripDistanceCalculator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -167,7 +166,11 @@ const TripPlanner: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
     if (selectedDestinations.length === 0) {
       toast({
         title: "Destination Required",
@@ -240,184 +243,182 @@ const TripPlanner: React.FC = () => {
   );
 
   return (
-    <Layout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold mb-2">Plan Your Trip</h1>
-          <p className="text-muted-foreground">Create your perfect travel itinerary with Zenway Travels</p>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold mb-2">Plan Your Trip</h1>
+        <p className="text-muted-foreground">Create your perfect travel itinerary with Zenway Travels</p>
+      </div>
 
-        <div className="mb-6">
-          <PremiumFeaturesBanner isPremium={isPremium} />
-        </div>
+      <div className="mb-6">
+        <PremiumFeaturesBanner isPremium={isPremium} />
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid grid-cols-5 mb-4">
-                <TabsTrigger value="destinations">Destinations</TabsTrigger>
-                <TabsTrigger value="dates">Dates & People</TabsTrigger>
-                <TabsTrigger value="accommodation">Accommodation</TabsTrigger>
-                <TabsTrigger value="transport">Transport</TabsTrigger>
-                <TabsTrigger value="guides">Guides</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="destinations" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Select Destinations</CardTitle>
-                    <CardDescription>
-                      Choose one or more destinations for your trip
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <DestinationSelector 
-                      destinations={destinations}
-                      selectedDestinations={selectedDestinations}
-                      onSelectDestination={handleSelectDestination}
-                    />
-                  </CardContent>
-                </Card>
-
-                {selectedDestinations.length > 0 && (
-                  <TripDistanceCalculator
-                    destinationIds={selectedDestinations}
-                    numberOfDays={numberOfDays}
-                    startDate={startDate}
-                    selectedTransportType={transportType}
-                    onSuggestTransport={handleSuggestTransport}
-                    onSuggestDays={handleAdjustDays}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-5 mb-4">
+              <TabsTrigger value="destinations">Destinations</TabsTrigger>
+              <TabsTrigger value="dates">Dates & People</TabsTrigger>
+              <TabsTrigger value="accommodation">Accommodation</TabsTrigger>
+              <TabsTrigger value="transport">Transport</TabsTrigger>
+              <TabsTrigger value="guides">Guides</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="destinations" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Select Destinations</CardTitle>
+                  <CardDescription>
+                    Choose one or more destinations for your trip
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DestinationSelector 
+                    destinations={destinations}
+                    selectedDestinations={selectedDestinations}
+                    onSelectDestination={handleSelectDestination}
                   />
-                )}
-              </TabsContent>
+                </CardContent>
+              </Card>
+
+              {selectedDestinations.length > 0 && (
+                <TripDistanceCalculator
+                  destinationIds={selectedDestinations}
+                  numberOfDays={numberOfDays}
+                  startDate={startDate}
+                  selectedTransportType={transportType}
+                  onSuggestTransport={handleSuggestTransport}
+                  onSuggestDays={handleAdjustDays}
+                />
+              )}
+            </TabsContent>
+            
+            <TabsContent value="dates" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Trip Duration & Group Size</CardTitle>
+                  <CardDescription>
+                    Select your travel dates and number of travelers
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DatePeoplePicker 
+                    numberOfDays={numberOfDays}
+                    setNumberOfDays={setNumberOfDays}
+                    numberOfPeople={numberOfPeople}
+                    setNumberOfPeople={setNumberOfPeople}
+                    startDate={startDate}
+                    setStartDate={setStartDate}
+                  />
+                </CardContent>
+              </Card>
               
-              <TabsContent value="dates" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Trip Duration & Group Size</CardTitle>
-                    <CardDescription>
-                      Select your travel dates and number of travelers
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <DatePeoplePicker 
-                      numberOfDays={numberOfDays}
-                      setNumberOfDays={setNumberOfDays}
-                      numberOfPeople={numberOfPeople}
-                      setNumberOfPeople={setNumberOfPeople}
-                      startDate={startDate}
-                      setStartDate={setStartDate}
-                    />
-                  </CardContent>
-                </Card>
-                
-                {!isFeasible && feasibilityDetails && (
-                  <TripValidation
-                    feasible={isFeasible}
-                    daysNeeded={feasibilityDetails.daysNeeded}
-                    daysShort={feasibilityDetails.daysShort}
-                    breakdown={feasibilityDetails.breakdown}
+              {!isFeasible && feasibilityDetails && (
+                <TripValidation
+                  feasible={isFeasible}
+                  daysNeeded={feasibilityDetails.daysNeeded}
+                  daysShort={feasibilityDetails.daysShort}
+                  breakdown={feasibilityDetails.breakdown}
+                  transportType={transportType}
+                  totalDistance={feasibilityDetails.totalDistance}
+                  totalTravelHours={feasibilityDetails.totalTravelHours}
+                  onAdjustDays={() => handleAdjustDays(feasibilityDetails.daysNeeded)}
+                  onContinue={() => setActiveTab('accommodation')}
+                  isPremium={isPremium}
+                />
+              )}
+            </TabsContent>
+            
+            <TabsContent value="accommodation" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Accommodation</CardTitle>
+                  <CardDescription>
+                    Choose your hotel type and travel style
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <HotelTypeSelector 
+                    hotelType={hotelType}
+                    handleSelectHotelType={handleSelectHotelType}
+                    travelStyle={travelStyle}
+                    setTravelStyle={setTravelStyle}
+                    selectedDestinations={selectedDestinations}
+                    filteredHotels={filteredHotels}
+                    getDestinationById={getDestinationById}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="transport" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Transport</CardTitle>
+                  <CardDescription>
+                    Choose your preferred mode of travel
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <TransportTypeSelector 
                     transportType={transportType}
-                    totalDistance={feasibilityDetails.totalDistance}
-                    totalTravelHours={feasibilityDetails.totalTravelHours}
-                    onAdjustDays={() => handleAdjustDays(feasibilityDetails.daysNeeded)}
-                    onContinue={() => setActiveTab('accommodation')}
+                    setTransportType={setTransportType}
+                    sleepTransport={sleepTransport}
+                    setSleepTransport={setSleepTransport}
+                    relevantTransports={relevantTransports}
+                    selectedTransport={selectedTransport}
+                    handleSelectTransport={handleSelectTransport}
+                    suggestedTransport={suggestedTransport}
                     isPremium={isPremium}
                   />
-                )}
-              </TabsContent>
-              
-              <TabsContent value="accommodation" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Accommodation</CardTitle>
-                    <CardDescription>
-                      Choose your hotel type and travel style
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <HotelTypeSelector 
-                      hotelType={hotelType}
-                      handleSelectHotelType={handleSelectHotelType}
-                      travelStyle={travelStyle}
-                      setTravelStyle={setTravelStyle}
-                      selectedDestinations={selectedDestinations}
-                      filteredHotels={filteredHotels}
-                      getDestinationById={getDestinationById}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="transport" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Transport</CardTitle>
-                    <CardDescription>
-                      Choose your preferred mode of travel
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <TransportTypeSelector 
-                      transportType={transportType}
-                      setTransportType={setTransportType}
-                      sleepTransport={sleepTransport}
-                      setSleepTransport={setSleepTransport}
-                      relevantTransports={relevantTransports}
-                      selectedTransport={selectedTransport}
-                      handleSelectTransport={handleSelectTransport}
-                      suggestedTransport={suggestedTransport}
-                      isPremium={isPremium}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="guides" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Guides</CardTitle>
-                    <CardDescription>
-                      Optional: Select a guide for your trip
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <GuideSelector 
-                      selectedDestinations={selectedDestinations}
-                      availableGuides={availableGuides}
-                      selectedGuides={selectedGuides}
-                      handleSelectGuide={handleSelectGuide}
-                      isPremium={isPremium}
-                    />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="guides" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Guides</CardTitle>
+                  <CardDescription>
+                    Optional: Select a guide for your trip
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <GuideSelector 
+                    selectedDestinations={selectedDestinations}
+                    availableGuides={availableGuides}
+                    selectedGuides={selectedGuides}
+                    handleSelectGuide={handleSelectGuide}
+                    isPremium={isPremium}
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
 
-          <div className="lg:col-span-1">
-            <TripCostBreakdown 
-              selectedDestinations={selectedDestinations}
-              startDate={startDate}
-              numberOfDays={numberOfDays}
-              numberOfPeople={numberOfPeople}
-              hotelType={hotelType}
-              travelStyle={travelStyle}
-              transportType={transportType}
-              sleepTransport={sleepTransport}
-              selectedGuides={selectedGuides}
-              guides={guides}
-              costBreakdown={costBreakdown}
-              totalCost={totalCost}
-              isPlanning={isPlanning}
-              isFeasible={isFeasible}
-              getDestinationById={getDestinationById}
-              onSubmit={handleSubmit}
-            />
-          </div>
+        <div className="lg:col-span-1">
+          <TripCostBreakdown 
+            selectedDestinations={selectedDestinations}
+            startDate={startDate}
+            numberOfDays={numberOfDays}
+            numberOfPeople={numberOfPeople}
+            hotelType={hotelType}
+            travelStyle={travelStyle}
+            transportType={transportType}
+            sleepTransport={sleepTransport}
+            selectedGuides={selectedGuides}
+            guides={guides}
+            costBreakdown={costBreakdown}
+            totalCost={totalCost}
+            isPlanning={isPlanning}
+            isFeasible={isFeasible}
+            getDestinationById={getDestinationById}
+            onSubmit={handleSubmit}
+          />
         </div>
       </div>
-    </Layout>
+    </div>
   );
 };
 
