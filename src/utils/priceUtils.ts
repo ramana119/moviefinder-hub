@@ -46,8 +46,23 @@ export const calculateHotelCostPerDay = (
 export const calculateTransportCost = (
   transportType: 'bus' | 'train' | 'flight' | 'car',
   distanceKm: number,
-  baseCostPerKm: number = 0.5
+  baseCostPerKm: number = 5
 ): number => {
   const baseDistanceCost = distanceKm * baseCostPerKm;
   return baseDistanceCost * getTransportTypeMultiplier(transportType);
+};
+
+// Calculate final price with all factors considered
+export const calculateFinalPrice = (
+  basePrice: number,
+  hotelType: 'budget' | 'standard' | 'luxury',
+  transportType: 'bus' | 'train' | 'flight' | 'car',
+  numberOfDays: number,
+  numberOfPeople: number
+): number => {
+  const hotelCost = calculateHotelCostPerDay(hotelType) * numberOfDays * numberOfPeople;
+  const transportCost = calculateTransportCost(transportType, 300) * numberOfPeople;
+  const baseActivityCost = basePrice * numberOfPeople;
+  
+  return hotelCost + transportCost + baseActivityCost;
 };

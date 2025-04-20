@@ -56,14 +56,24 @@ export interface TripItineraryDay {
 }
 
 export interface TripPlanningContextType {
+  tripPlans: TripPlan[];
+  currentTripPlan: TripPlan | null;
+  isLoading: boolean;
+  error: string | null;
+  tripPlanParams: TripPlanQueryParams;
+  setTripPlanParams: React.Dispatch<React.SetStateAction<TripPlanQueryParams>>;
+  createTripPlan: (name: string) => Promise<TripPlan | null>;
+  updateTripPlan: (tripPlanId: string, updates: Partial<TripPlan>) => Promise<TripPlan | null>;
+  deleteTripPlan: (tripPlanId: string) => Promise<boolean>;
+  getTripPlanById: (tripPlanId: string) => TripPlan | null;
+  getUserTripPlans: () => Promise<TripPlan[]>;
+  clearCurrentTripPlan: () => void;
+  generateItinerary: () => DayPlan[];
+  // Add missing properties used in components
   hotels: HotelType[];
   transports: TransportType[];
   guides: GuideType[];
-  tripPlans: TripPlan[];
   loading: boolean;
-  error: string | null;
-  getHotelsByDestination: (destinationId: string) => HotelType[];
-  getGuidesByDestination: (destinationId: string) => GuideType[];
   calculateTripCost: (options: {
     destinationIds: string[];
     guideIds: string[];
@@ -79,9 +89,6 @@ export interface TripPlanningContextType {
     totalCost: number;
   };
   saveTripPlan: (tripPlanData: Omit<TripPlan, 'id' | 'createdAt'>) => Promise<string>;
-  getUserTripPlans: (userId: string) => TripPlan[];
-  getTripPlanById: (id: string) => TripPlan | undefined;
-  cancelTripPlan: (tripPlanId: string) => Promise<void>;
   checkTripFeasibility: (options: {
     destinationIds: string[];
     transportType: 'bus' | 'train' | 'flight' | 'car';
@@ -100,15 +107,6 @@ export interface TripPlanningContextType {
     totalDistance: number;
     totalTravelHours: number;
   };
-  generateOptimalItinerary: (options: {
-    destinationIds: string[];
-    transportType: 'bus' | 'train' | 'flight' | 'car';
-    numberOfDays: number;
-    startDate: Date;
-    travelStyle?: 'base-hotel' | 'mobile';
-    isPremium?: boolean;
-  }) => TripItineraryDay[];
-  calculateDistanceBetweenDestinations: (from: Destination, to: Destination) => number;
   getDistanceMatrix: (destinationIds: string[]) => {
     fromId: string;
     toId: string;
@@ -133,7 +131,32 @@ export interface TripPlanningContextType {
     premiumAdvantages?: string[];
   };
   getTransportAmenities: (type: string, isOvernight: boolean) => string[];
-  getOptimalHotels: (destinationIds: string[]) => HotelType[];
-  getNearbyHotels: (destinationId: string, limit?: number) => HotelType[];
-  calculateHotelProximity: (hotel: HotelType, destination: Destination) => HotelType;
+  getHotelsByDestination: (destinationId: string) => HotelType[];
+  generateOptimalItinerary: (options: {
+    destinationIds: string[];
+    transportType: 'bus' | 'train' | 'flight' | 'car';
+    numberOfDays: number;
+    startDate: Date;
+    travelStyle?: 'base-hotel' | 'mobile';
+    hotelType?: 'budget' | 'standard' | 'luxury';
+    isPremium?: boolean;
+  }) => TripItineraryDay[];
+  cancelTripPlan: (tripPlanId: string) => Promise<void>;
+}
+
+export interface DayPlan {
+  day: number;
+  date: Date;
+  destinationId: string;
+  activities: string[];
+  stayDestinationId: string;
+}
+
+export interface TripPlanQueryParams {
+  destinations?: string[];
+  startDate?: Date;
+  endDate?: Date;
+  numberOfDays?: number;
+  travelStyle?: 'base-hotel' | 'mobile';
+  budget?: number;
 }
